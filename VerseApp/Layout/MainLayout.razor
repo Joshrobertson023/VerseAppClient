@@ -1,0 +1,113 @@
+﻿@inherits LayoutComponentBase
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+
+<MudLayout> 
+    <MudAppBar Bottom="true" Class="px-0">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <div class="d-flex flex-grow-1 justify-space-evenly no-hover">
+            @if (firstOpen)
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Article" Ripple="false" Color="Color.Inherit" OnClick="@((e) => FirstClick())" />
+            }
+            else
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Article" Color="Color.Inherit" OnClick="@((e) => FirstClick())" />
+            }
+            @if (secondOpen)
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircle" Ripple="false" Color="Color.Inherit" OnClick="@((e) => SecondClick())" />
+            }
+            else
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" OnClick="@((e) => SecondClick())" />
+            }
+            @if (thirdOpen)
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Book" Ripple="false" Color="Color.Inherit" OnClick="@((e) => ThirdClick())" />
+            }
+            else
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Book" Color="Color.Inherit" OnClick="@((e) => ThirdClick())" />
+            }
+            @if (fourthOpen)
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Person" Ripple="false" Color="Color.Inherit" OnClick="@((e) => FourthClick())" />
+            }
+            else
+            {
+                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Person" Color="Color.Inherit" OnClick="@((e) => FourthClick())" />
+            }
+        </div>
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen"> 
+
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _isDarkMode;
+    private MudThemeProvider _mudThemeProvider;
+    [Inject]
+    NavigationManager nav { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+            StateHasChanged();
+        }
+    }
+
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private bool firstOpen = true;
+    private bool secondOpen = false;
+    private bool thirdOpen = false;
+    private bool fourthOpen = false;
+
+    private void FirstClick()
+    {
+        firstOpen = true;
+        secondOpen = false;
+        thirdOpen = false;
+        fourthOpen = false;
+    }
+
+    private void SecondClick()
+    {
+        firstOpen = false;
+        secondOpen = true;
+        thirdOpen = false;
+        fourthOpen = false;
+    }
+
+    private void ThirdClick()
+    {
+        firstOpen = false;
+        secondOpen = false;
+        thirdOpen = true;
+        fourthOpen = false;
+    }
+
+    private void FourthClick()
+    {
+        firstOpen = false;
+        secondOpen = false;
+        thirdOpen = false;
+        fourthOpen = true;
+        nav.NavigateTo("/profile");
+    }
+}
