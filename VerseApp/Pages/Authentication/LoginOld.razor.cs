@@ -1,130 +1,36 @@
-﻿using DBAccessLibrary.Models;
-using DBAccessLibrary;
-using Microsoft.AspNetCore.Components;
-using System.Net;
-using System.Net.Mail;
-using static System.Net.WebRequestMethods;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Net.Http.Json;
-using Blazored.LocalStorage;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using MudBlazor;
+﻿//using DBAccessLibrary.Models;
+//using DBAccessLibrary;
+//using Microsoft.AspNetCore.Components;
+//using System.Net;
+//using System.Net.Mail;
+//using static System.Net.WebRequestMethods;
+//using static System.Runtime.InteropServices.JavaScript.JSType;
+//using System.Net.Http.Json;
+//using Blazored.LocalStorage;
+//using Microsoft.Extensions.Configuration;
+//using Microsoft.IdentityModel.Tokens;
+//using System.IdentityModel.Tokens.Jwt;
+//using System.Security.Claims;
+//using System.Text;
 
-namespace VerseApp.Pages.Authentication
-{
-    public partial class Login : ComponentBase
-    {
-        [Inject]
-        NavigationManager nav { get; set; }
-        [Inject]
-        Data data { get; set; }
-        private string errorMessage;
-        private string message;
-        private string username;
-        private string password;
-        private int retryCount;
-        private string overlayMessage;
-
-        #region passwordTextField
-        bool isShow;
-        InputType PasswordInput = InputType.Password;
-        string PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-
-        void ButtonTestclick()
-        {
-            if(isShow)
-            {
-                isShow = false;
-                PasswordInputIcon = Icons.Material.Filled.VisibilityOff;
-                PasswordInput = InputType.Password;
-            }
-        else
-            {
-                isShow = true;
-                PasswordInputIcon = Icons.Material.Filled.Visibility;
-                PasswordInput = InputType.Text;
-            }
-        }
-        #endregion
-
-        private bool overlayVisible = false;
-
-        private void ToggleOverlay()
-        {
-            overlayVisible = !overlayVisible;
-            StateHasChanged();
-        }
-
-        private void CloseDrawer()
-        {
-
-        }
-
-        private async Task Signin_Click()
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(username))
-                {
-                    message = "Please enter a username";
-                    return;
-                }
-                if (string.IsNullOrEmpty(password))
-                {
-                    message = "Please enter a password";
-                    return;
-                }
-
-                overlayVisible = true;
-                message = "";
-                errorMessage = "";
-                //await data.GetAllUsernames();
-
-                //foreach (var _username in data.usernames)
-                //{
-                //    if (username.Trim() == _username.Trim())
-                //    {
-                //        errorMessage = "";
-                //        overlayVisible = false;
-                //        nav.NavigateTo("/");
-                //    }
-                //}
-
-                throw new Exception("Connection timed out.");
-
-                //message = "Username does not exist.";
-                //overlayVisible = false;
-            }
-            catch (Exception ex)
-            {
-                errorMessage = ex.Message;
-                if (errorMessage.ToLower().Contains("timed out"))
-                {
-                    errorMessage = "Connection timed out.";
-                    retryCount++;
-                    overlayMessage = $"We had trouble connecting.\nRetrying ({retryCount})...";
-                    //await Signin_Click();
-                }
-                else
-                {
-                    errorMessage = "We encountered an error. Please try again.";
-                    overlayVisible = false;
-                }
-            }
-        }
-
-        private void CreateAnAccount_Click()
-        {
-            errorMessage = "";
-            message = "";
-        }
-    }
-}
-
+//namespace VerseApp.Pages
+//{
+//    public partial class Login : ComponentBase
+//    {
+//        [Inject]
+//        NavigationManager nav { get; set; }
+//        [Inject]
+//        Data data { get; set; }
+//        [Inject]
+//        IHttpClientFactory HttpFactory { get; set; }
+//        [Inject]
+//        ILocalStorageService localStorage { get; set; }
+//        private HttpClient http => HttpFactory.CreateClient("api");
+//        private string? errorMessage;
+//        private bool enteringName = true;
+//        private bool loading = false;
+//        private string? username;
+//        private string? password;
 //        private string? message = "";
 //        private string? cookieMessage;
 //        UserModel userLoggingIn;
@@ -439,19 +345,19 @@ namespace VerseApp.Pages.Authentication
 //            }
 //        }
 
-//    public class LoginRequest
-//    {
-//        public string Username { get; set; }
-//        public string Password { get; set; }
-//    }
-
-//    public class LoginResponse
-//    {
-//        public string Token { get; set; }
-//        public DateTime Expiration { get; set; }
+//        public class LoginRequest
+//        {
+//            public string Username { get; set; }
+//            public string Password { get; set; }
 //        }
 
-//}
+//        public class LoginResponse
+//        {
+//            public string Token { get; set; }
+//            public DateTime Expiration { get; set; }
+//        }
+
+//    }
 //}
 
 

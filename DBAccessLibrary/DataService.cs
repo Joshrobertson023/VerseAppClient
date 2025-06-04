@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using DBAccessLibrary.Models;
 using DBAccessLibrary;
 using static System.Net.WebRequestMethods;
+using System.Net.Http.Headers;
 
 namespace DBAccessLibrary
 {
@@ -16,11 +17,10 @@ namespace DBAccessLibrary
         string baseAPIUrl = "";
 
         private IHttpClientFactory factory;
-        private Data data;
-        public DataService(IHttpClientFactory _factory, Data _data)
+        public Data data;
+        public DataService(IHttpClientFactory _factory)
         {
             factory = _factory;
-            data = _data;
         }
 
         private HttpClient http => factory.CreateClient("api");
@@ -48,6 +48,14 @@ namespace DBAccessLibrary
         public async Task GetAllUsernames()
         {
             data.usernames = await http.GetFromJsonAsync<List<string>>($"{baseAPIUrl}api/user/usernames");
+        }
+
+        public async Task LoginUserWithTokenAsync(string token)
+        {
+            throw new Exception("This is for testing");
+            http.DefaultRequestHeaders.Remove("Auth-Token");
+            http.DefaultRequestHeaders.Add("Auth-Token", token);
+            data.currentUser = await http.GetFromJsonAsync<UserModel>("api/users/currentUser");
         }
     }
 }

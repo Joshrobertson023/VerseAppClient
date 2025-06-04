@@ -1,7 +1,6 @@
 ﻿using DBAccessLibrary;
 using DBAccessLibrary;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace VerseApp.Pages
 {
@@ -9,7 +8,7 @@ namespace VerseApp.Pages
     {
         private bool loading { get; set; } = false;
         [Inject]
-        DataService data { get; set; }
+        Data data { get; set; }
 
         private void Login()
         {

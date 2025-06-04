@@ -23,7 +23,72 @@
     box-shadow: none !important;
 }
 
+/*html, body, #app, .mud-main-content, .mud-layout, .single-stack {
+    height: 100% !important;
+}*/
 
+.mud-main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.single-stack {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mud-overlay-content {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mud-button {
+    text-transform: none !important;
+    border-radius: 22px !important;
+}
+
+.label {
+    font-size: 1rem;
+    color: #C3C3C3;
+    font-weight: 300;
+    font-family: "Inter", "Helvetica", "Arial", "sans-serif";
+}
+
+.mud-input-control > .mud-input-control-input-container > .mud-input-label-inputcontrol {
+    font-size: 0.9rem;
+    color: #C3C3C3;
+    font-weight: 300;
+    font-family: "Inter", "Helvetica", "Arial", "sans-serif";
+}
+
+.mud-input-outlined-border {
+    border-radius: 10px !important;
+}
+
+.mud-button-text:hover {
+    background-color: transparent !important;
+}
+
+.mud-button-text:hover .mud-button-label {
+    text-decoration: underline !important;
+}
+
+.custom {
+    margin-top: -15px;
+    margin-bottom: 15px;
+}
 
 
 

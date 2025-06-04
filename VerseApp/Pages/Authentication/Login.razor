@@ -1,105 +1,55 @@
 ﻿@page "/authentication/login"
 @namespace VerseApp.Pages.Authentication
+@layout NoNav
+@inject IDialogService DialogService
 
-@if (loading)
-{
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-7" />
-}
-
-<MudContainer Class="mt-16 px-8" MaxWidth="MaxWidth.False">
-
-    @if (!string.IsNullOrWhiteSpace(errorMessage))
-    {
-        <MudAlert Style="margin-bottom: 15px;" Severity="Severity.Error" Elevation="2" Class="mt-2">
-            @errorMessage
-        </MudAlert>
-    }
-    @if (enteringName)
-    {
-        <h3>Login</h3>
-        if (!forgotUsername)
+    <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+        <MudProgressLinear Color="Color.Primary" Style="width: 50%; margin-bottom: 15px; margin-top: -35px; margin-right: 5px;" Indeterminate="true" />
+        @if (!string.IsNullOrEmpty(overlayMessage))
         {
-            <MudPaper Class="pa-4">
-                <MudTextField @bind-Value="username" Label="Username" T="string" Immediate="true" Required="true" />
-                <MudButton OnClick="Next" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Next</MudButton>
-                <MudButton OnClick="ToggleForgotUsername" Variant="Variant.Outlined" Color="Color.Primary" Class="ml-auto">Forgot Username</MudButton>
-            </MudPaper>
+            <h2>@overlayMessage</h2>
         }
         else
         {
-            if (!forgotPassword)
-            {
-                <MudFab OnClick="ToggleForgotUsername" Style="position: fixed; top: 80px; left: 273px; z-index: 999;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-                <MudPaper Class="pa-4">
-                    <MudTextField @bind-Value="recoveryFirstName" Label="First Name" T="string" Immediate="true" Required="true" />
-                    <MudTextField @bind-Value="recoveryLastName" Label="Last Name" T="string" Immediate="true" Required="true" />
-                    <MudTextField @bind-Value="passwordRecoverUsername" T="string" Label="Enter your password"
-                    InputType="InputType.Password"
-                    Required="true"
-                    Immediate="true" />
-                    <MudButton OnClick="NextWithNames" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Recover Username</MudButton>
-                    <MudButton OnClick="ToggleForgotPasswordUsername" Variant="Variant.Text" Color="Color.Primary" Class="ml-auto">Forgot Password</MudButton>
-                    @if (message.Contains("Your username is"))
-                    {
-                        <p>@message</p>
-                    }
-                </MudPaper>
-            }
-            if (forgotPasswordAndUsername)
-            {
-                <MudPaper Class="pa-4">
-                    <p>Enter your full name and email address to receive a link to reset your password:</p>
-                    <MudTextField @bind-Value="firstName" Label="First Name" T="string" Immediate="true" Required="true" />
-                    <MudTextField @bind-Value="lastName" Label="Last Name" T="string" Immediate="true" Required="true" />
-                    <MudTextField @bind-Value="recoveryEmail" Label="Email" T="string" Immediate="true" Required="true" />
-                    <MudFab OnClick="forgotPasswordAndUsernameBack" Style="position: fixed; top: 80px; left: 273px; z-index: 999;" Color="Color.Primary" StartIcon="@Icons.Material.Filled.ArrowBack" Size="Size.Small" />
-                    <MudButton OnClick="ResetPasswordFullName" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Send Link</MudButton>
-                    @if (resetLinkSent)
-                    {
-                        <h5>Check your inbox for the reset link.</h5>
-
-                        <br />
-                        <MudButton OnClick="BackToLogin" Variant="Variant.Outlined" Color="Color.Primary" Class="ml-auto">Back To Login</MudButton>
-                    }
-                </MudPaper>
-            }
+            <h2 style="margin-left: 5px;">Loading...</h2>
         }
-    }
-    else
-    {
-        <h3>Enter your password:</h3>
-        if (!forgotPassword)
+</MudOverlay>
+
+
+<div class="single-stack">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 70%;">
+        <h1 style="text-align: center; margin-bottom: 25%; margin-top: 25%;">VerseApp</h1>
+        @if (!string.IsNullOrEmpty(errorMessage))
         {
-            <MudTextField @bind-Value="password" T="string" HelperText="Enter your password"
-            InputType="InputType.Password"
-            Required="true"
-            Immediate="true"/>
-            <MudButton OnClick="Signin" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Login</MudButton>
-            <MudButton OnClick="Back" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Back</MudButton>
-            <MudButton OnClick="ToggleForgotPassword" Variant="Variant.Text" Color="Color.Primary" Class="ml-auto">Forgot Password</MudButton>
+            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+                <p style="margin-left: 5px;">@errorMessage</p>
+            </div>
         }
-        else
+        <h3 style="text-align: center; margin-bottom: 10%;">Sign in to your account</h3>
+        <div class="button">
+            <MudTextField @bind-Value="username" Label="Username" Variant="Variant.Outlined"></MudTextField>
+        </div>
+        <div class="button custom">
+            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+        </div>
+        @if (!string.IsNullOrEmpty(message))
         {
-            <MudPaper Class="pa-4">
-                <p>Enter your username and email address to reset your password:</p>
-                <MudTextField @bind-Value="username" HelperText="Username" T="string" Immediate="true" Required="true" />
-                <MudTextField @bind-Value="recoveryEmail" HelperText="Email" T="string" Immediate="true" Required="true" />
-                <MudButton OnClick="ToggleForgotPassword" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Back</MudButton>
-                <MudButton OnClick="ResetPassword" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Reset Password</MudButton>
-                @if (resetLinkSent)
-                {
-                    <h5>Check your inbox for the reset link.</h5>
-
-                    <br />
-                    <MudButton OnClick="BackToLogin" Variant="Variant.Outlined" Color="Color.Primary" Class="ml-auto">Back To Login</MudButton>
-                }
-            </MudPaper>
-            <h6>Didn't add a recovery email? Please go to the following link and submit a help request: </h6>
+            <div style="margin-top: -25px;">
+                <p>@message</p>
+            </div>
         }
-    }
-
-    @if (message != null)
-    {
-        <p>@message</p>
-    }
-</MudContainer>
+        <div class="button">
+            <MudButton OnClick="Signin_Click" Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" Class="ml-auto">Sign in</MudButton>
+		</div>
+        <div class="button">
+            <MudButton OnClick="CreateAnAccount_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Create an account</MudButton>
+        </div>
+        <div class="button">
+            <MudButton OnClick="ToggleOverlay" Variant="Variant.Text" Color="Color.Secondary" Style="margin-bottom: -15px;" FullWidth="true" Class="ml-auto">Forgot Username</MudButton>
+        </div>
+        <div class="button">
+            <MudButton OnClick="ToggleOverlay" Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" Class="ml-auto">Forgot Password</MudButton>
+        </div>
+    </MudStack>
+</div>

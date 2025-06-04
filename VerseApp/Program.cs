@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using VerseApp;
 using MudBlazor.Services;
 using DBAccessLibrary;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
+using MudBlazor;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -14,17 +14,102 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddHttpClient("api", client =>
 {
     client.BaseAddress = new Uri("https://localhost:7070/");
-    // <-- Ensure this matches the URL your API is running on
-}).AddHttpMessageHandler<BaseAddressAuthorizationMessageHandler>();
+});
 
 builder.Services.AddMudServices();
 builder.Services.AddScoped<DataService>();
 builder.Services.AddSingleton<Data>();
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddOptions();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddMudServices(service =>
+{
+    MudTheme AppTheme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
+        {
+            Primary = "#1565C0",
+             Background = "#EBEBEB"
+            //Secondary = "#C3C3C3", // Light gray
+            // Info = "rgba(1, 37, 37, 37)" // Dark gray for cards
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#1565C0",
+             Background = "#141414",
+            Secondary = "#C3C3C3", // Light gray
+             Info = "#252525" // Dark gray for cards
+             //Text color: EAE9FC
+        },
+        Typography = new Typography()
+        {
+            Default = new DefaultTypography()
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "0.7rem",
+                FontWeight = "500",
+                LineHeight = "1",
+                LetterSpacing = ".01em"
+            },
+            H1 = new H1Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "2rem",
+                FontWeight = "500",
+                LineHeight = "1.6",
+                LetterSpacing = ".0075em"
+            },
+            H2 = new H2Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "1.75rem",
+                FontWeight = "500",
+                LineHeight = "1.5",
+                LetterSpacing = ".01em"
+            },
+            H3 = new H3Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "1.5rem",
+                FontWeight = "400",
+                LineHeight = "1.4",
+                LetterSpacing = ".0075em"
+            },
+            H4 = new H4Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "1.25rem",
+                FontWeight = "400",
+                LineHeight = "1.4",
+                LetterSpacing = ".0075em"
+            },
+            H5 = new H5Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "1.25rem",
+                FontWeight = "400",
+                LineHeight = "1.4",
+                LetterSpacing = ".0075em"
+            },
+            H6 = new H6Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "1rem",
+                FontWeight = "300",
+                LineHeight = "1.4",
+                LetterSpacing = ".0075em"
+            },
+            Subtitle1 = new Subtitle1Typography
+            {
+                FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
+                FontSize = "0.85rem",
+                FontWeight = "300",
+                LineHeight = "1",
+                LetterSpacing = ".0075em"
+            }
+        }
+    };
+builder.Services.AddSingleton(AppTheme);
+});
 
-builder.Services.AddApiAuthorization();
 
 await builder.Build().RunAsync();

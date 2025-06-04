@@ -1,9 +1,12 @@
 ﻿@inherits LayoutComponentBase
-<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" />
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject MudTheme AppTheme
+<MudThemeProvider Theme="AppTheme"/>
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
+@* @bind-IsDarkMode="_isDarkMode" *@
 
 <MudLayout> 
     <MudAppBar Bottom="true" Class="px-0">
@@ -56,15 +59,52 @@
     private MudThemeProvider _mudThemeProvider;
     [Inject]
     NavigationManager nav { get; set; }
+    [Inject]
+    DataService dataservice { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
+        var token = await GetTokenAsync();
+
+        if (string.IsNullOrWhiteSpace(token))
         {
-            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
-            StateHasChanged();
+            nav.NavigateTo("/authentication/login");
+            return;
+        }
+
+        try
+        {
+            await dataservice.LoginUserWithTokenAsync(token);
+            if (dataservice.data.currentUser == null)
+            {
+                nav.NavigateTo("/authentication/login");
+            }
+        }
+        catch
+        {
+            nav.NavigateTo("/authentication/login");
         }
     }
+
+
+    private async Task SaveTokenAsync(string token)
+    {
+        await localStorage.SetItemAsync("authToken", token);
+    }
+
+    private async Task<string> GetTokenAsync()
+    {
+        return await localStorage.GetItemAsync<string>("authToken");
+    }
+
+    // protected override async Task OnAfterRenderAsync(bool firstRender)
+    // {
+    //     if (firstRender)
+    //     {
+    //         _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+    //         StateHasChanged();
+    //     }
+    // }
 
     bool _drawerOpen = false;
 

@@ -1,0 +1,89 @@
+﻿@inherits LayoutComponentBase
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject MudTheme AppTheme
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" Theme="AppTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout> 
+    <MudDrawer @bind-Open="@_drawerOpen"> 
+
+    </MudDrawer>
+    <MudMainContent>
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _isDarkMode;
+    private MudThemeProvider _mudThemeProvider;
+    [Inject]
+    NavigationManager nav { get; set; }
+    [Inject]
+    DataService dataservice { get; set; }
+
+    private async Task SaveTokenAsync(string token)
+    {
+        await localStorage.SetItemAsync("authToken", token);
+    }
+
+    private async Task<string> GetTokenAsync()
+    {
+        return await localStorage.GetItemAsync<string>("authToken");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+            StateHasChanged();
+        }
+    }
+
+    bool _drawerOpen = false;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    private bool firstOpen = true;
+    private bool secondOpen = false;
+    private bool thirdOpen = false;
+    private bool fourthOpen = false;
+
+    private void FirstClick()
+    {
+        firstOpen = true;
+        secondOpen = false;
+        thirdOpen = false;
+        fourthOpen = false;
+    }
+
+    private void SecondClick()
+    {
+        firstOpen = false;
+        secondOpen = true;
+        thirdOpen = false;
+        fourthOpen = false;
+    }
+
+    private void ThirdClick()
+    {
+        firstOpen = false;
+        secondOpen = false;
+        thirdOpen = true;
+        fourthOpen = false;
+    }
+
+    private void FourthClick()
+    {
+        firstOpen = false;
+        secondOpen = false;
+        thirdOpen = false;
+        fourthOpen = true;
+        nav.NavigateTo("/profile");
+    }
+}

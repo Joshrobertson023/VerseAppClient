@@ -1,24 +1,11 @@
 ﻿@page "/"
-@using Microsoft.AspNetCore.Components.Authorization  @* Required for <AuthorizeView> *@
 
 @if (loading)
 {
-    <MudProgressLinear … />
+    <MudProgressLinear />
 }
 
-<MudContainer …>
+<MudContainer>
     <h3>My Verses</h3>
-
-    <AuthorizeView>
-        <Authorized>
-            
-
-
-
-
-        </Authorized>
-        <NotAuthorized>
             <p>Please login to see your verses.</p>
-        </NotAuthorized>
-    </AuthorizeView>
 </MudContainer>
