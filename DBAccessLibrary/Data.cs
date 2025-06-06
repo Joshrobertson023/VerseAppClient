@@ -12,6 +12,7 @@ namespace DBAccessLibrary
     {
         public List<string> usernames;
         public UserModel currentUser;
+        public List<RecoveryInfo> recoveryInfo;
 
         public Data()
         {

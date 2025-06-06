@@ -4,16 +4,26 @@
 @inject IDialogService DialogService
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-    <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
-        <MudProgressLinear Color="Color.Primary" Style="width: 50%; margin-bottom: 15px; margin-top: -35px; margin-right: 5px;" Indeterminate="true" />
-        @if (!string.IsNullOrEmpty(overlayMessage))
-        {
-            <h2>@overlayMessage</h2>
-        }
-        else
-        {
-            <h2 style="margin-left: 5px;">Loading...</h2>
-        }
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+                @foreach (var line in httpLogs)
+                {
+                    <MudText Typo="Typo.caption">@line</MudText>
+                }
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
 </MudOverlay>
 
 
@@ -47,10 +57,10 @@
             <MudButton OnClick="CreateAnAccount_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Create an account</MudButton>
         </div>
         <div class="button">
-            <MudButton OnClick="ToggleOverlay" Variant="Variant.Text" Color="Color.Secondary" Style="margin-bottom: -15px;" FullWidth="true" Class="ml-auto">Forgot Username</MudButton>
+            <MudButton OnClick="ForgotUsername_Click" Variant="Variant.Text" Color="Color.Secondary" Style="margin-bottom: -15px;" FullWidth="true" Class="ml-auto">Forgot Username</MudButton>
         </div>
         <div class="button">
-            <MudButton OnClick="ToggleOverlay" Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" Class="ml-auto">Forgot Password</MudButton>
+            <MudButton OnClick="ForgotPassword_Click" Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" Class="ml-auto">Forgot Password</MudButton>
         </div>
     </MudStack>
 </div>

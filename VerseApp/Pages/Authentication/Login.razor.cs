@@ -19,6 +19,7 @@ namespace VerseApp.Pages.Authentication
         private string password;
         private int retryCount;
         private string overlayMessage;
+        private int progress;
 
         #region passwordTextField
         bool isShow;
@@ -43,6 +44,18 @@ namespace VerseApp.Pages.Authentication
         #endregion
 
         private bool overlayVisible = false;
+        private List<string> httpLogs = new List<string>();
+
+        protected override void OnInitialized()
+        {
+            dataservice.OnStatusChanged += HandleDataServiceStatus;
+        }
+
+        private void HandleDataServiceStatus(string message)
+        {
+            httpLogs.Add(message);
+            StateHasChanged();
+        }
 
         private void ToggleOverlay()
         {
@@ -71,6 +84,10 @@ namespace VerseApp.Pages.Authentication
                 }
 
                 overlayVisible = true;
+                progress = 3;
+                overlayMessage = "Connecting to database...";
+                StateHasChanged();
+                await Task.Delay(200);
                 message = "";
                 errorMessage = "";
 
@@ -87,6 +104,10 @@ namespace VerseApp.Pages.Authentication
                     return;
                 }
 
+                progress = 55;
+                overlayMessage = "Checking password...";
+                StateHasChanged();
+                await Task.Delay(200);
                 string passwordHash = await dataservice.GetPasswordHash(username);
                 if (!PasswordHash.VerifyHash(password.Trim(), passwordHash))
                 {
@@ -94,6 +115,10 @@ namespace VerseApp.Pages.Authentication
                     return;
                 }
 
+                progress = 89;
+                overlayMessage = "Loading your data...";
+                StateHasChanged();
+                await Task.Delay(200);
                 data.currentUser = new UserModel();
                 data.currentUser = await dataservice.GetUser(username);
                 if (data.currentUser == null)
@@ -102,6 +127,9 @@ namespace VerseApp.Pages.Authentication
                     return;
                 }
                 await localStorage.SetItemAsync("authToken", data.currentUser.AuthToken);
+                progress = 100;
+                overlayMessage = "Done!";
+                await Task.Delay(1);
                 nav.NavigateTo("/");
             }
             catch (Exception ex)
@@ -125,6 +153,16 @@ namespace VerseApp.Pages.Authentication
         private void CreateAnAccount_Click()
         {
             nav.NavigateTo("/authentication/createaccount");
+        }
+
+        private void ForgotPassword_Click()
+        {
+            nav.NavigateTo("/authentication/forgot/password");
+        }
+
+        private void ForgotUsername_Click()
+        {
+            nav.NavigateTo("/authentication/forgot/username");
         }
     }
 }

@@ -106,9 +106,11 @@ namespace VerseApp.Pages.Authentication
                 progress = 0;
                 overlayVisible = true;
                 progress = 37;
+                overlayMessage = "Getting all usernames...";
                 await Task.Delay(1);
                 await dataservice.GetAllUsernames();
                 progress = 78;
+                overlayMessage = "Checking if your username is available...";
                 await Task.Delay(1);
                 data.usernames.Sort();
                 username = username.Trim();
@@ -133,6 +135,7 @@ namespace VerseApp.Pages.Authentication
                     securityAnswer = "NULL";
                 }
                 progress = 100;
+                overlayMessage = "Done!";
                 await Task.Delay(1);
                 nav.NavigateTo($"/authentication/createpassword/{firstName}/{lastName}/{username}/{email}/{securityQuestion}/{securityAnswer}");
             }

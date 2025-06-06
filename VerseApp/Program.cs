@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Components.Web;
+﻿using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using VerseApp;
 using MudBlazor.Services;
@@ -111,5 +111,9 @@ builder.Services.AddMudServices(service =>
 builder.Services.AddSingleton(AppTheme);
 });
 
+var host = builder.Build();
 
-await builder.Build().RunAsync();
+var dataService = host.Services.GetRequiredService<DataService>();
+_ = dataService.Warmup();
+
+await host.RunAsync();

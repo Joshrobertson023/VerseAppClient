@@ -13,6 +13,8 @@ namespace DBAccessLibrary.Models
         private string lastName;
         private string? email;
         private string passwordHash;
+        public int UserId { get; set; }
+        public string Token { get; set; }
         public int Id { get; set; }
         public string Username
         {

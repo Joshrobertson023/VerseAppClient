@@ -14,7 +14,16 @@
                 <MudAppBar Class="px-0">
                     <h2>PageTitle</h2>
                     <MudButton OnClick="@(() => ProfileDrawerToggle(Anchor.End))">
-                        <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">@data.currentUser.Username.ToUpper().Substring(0, 1)</MudAvatar>
+                        @if (!string.IsNullOrEmpty(data.currentUser?.Username))
+                        {
+                            <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
+                                @data.currentUser.Username.ToUpper()[0]
+                            </MudAvatar>
+                        }
+                        else
+                        {
+                            <MudAvatar Color="Color.Tertiary" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Person" />
+                        }
                     </MudButton>
 
                 </MudAppBar>
@@ -113,7 +122,7 @@
         if (string.IsNullOrWhiteSpace(token))
         {
             Console.WriteLine("token is null");
-            //nav.NavigateTo("/authentication/login");
+            nav.NavigateTo("/authentication/login");
             return;
         }
 
@@ -123,7 +132,7 @@
             if (data.currentUser == null)
             {
                 Console.WriteLine("currentUser is null.");
-                //nav.NavigateTo("/authentication/login");
+                nav.NavigateTo("/authentication/login");
             }
             else
             {
@@ -133,7 +142,7 @@
         catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
-            //nav.NavigateTo("/authentication/login");
+            nav.NavigateTo("/authentication/login");
         }
     }
 
@@ -200,7 +209,8 @@
 
     private async Task Signout_Click()
     {
-        data.currentUser = null;
+        if (data.currentUser != null)
+            data.currentUser = new DBAccessLibrary.Models.UserModel();
         await localStorage.ClearAsync();
         nav.NavigateTo("/authentication/login");
     }
