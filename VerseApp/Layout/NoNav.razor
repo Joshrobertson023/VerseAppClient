@@ -6,14 +6,18 @@
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-<MudLayout> 
-    <MudDrawer @bind-Open="@_drawerOpen"> 
+<div class="phone-view-outer">
+    <div class="phone-view">
+        <MudLayout> 
+            <MudDrawer @bind-Open="@_drawerOpen"> 
 
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+            </MudDrawer>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </div>
+</div>
 
 @code {
     private bool _isDarkMode;

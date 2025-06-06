@@ -2,6 +2,7 @@
 @namespace VerseApp.Pages.Authentication
 @layout NoNav
 @inject IDialogService DialogService
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
     <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
         <MudProgressLinear Color="Color.Primary" Style="width: 50%; margin-bottom: 15px; margin-top: -35px; margin-right: 5px;" Indeterminate="true" />

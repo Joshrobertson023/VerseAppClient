@@ -1,58 +1,100 @@
 ﻿@inherits LayoutComponentBase
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject MudTheme AppTheme
-<MudThemeProvider Theme="AppTheme"/>
+<MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" Theme="AppTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
-@* @bind-IsDarkMode="_isDarkMode" *@
 
-<MudLayout> 
-    <MudAppBar Bottom="true" Class="px-0">
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
-        <div class="d-flex flex-grow-1 justify-space-evenly no-hover">
-            @if (firstOpen)
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Article" Ripple="false" Color="Color.Inherit" OnClick="@((e) => FirstClick())" />
-            }
-            else
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Article" Color="Color.Inherit" OnClick="@((e) => FirstClick())" />
-            }
-            @if (secondOpen)
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircle" Ripple="false" Color="Color.Inherit" OnClick="@((e) => SecondClick())" />
-            }
-            else
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" OnClick="@((e) => SecondClick())" />
-            }
-            @if (thirdOpen)
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Book" Ripple="false" Color="Color.Inherit" OnClick="@((e) => ThirdClick())" />
-            }
-            else
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Book" Color="Color.Inherit" OnClick="@((e) => ThirdClick())" />
-            }
-            @if (fourthOpen)
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Person" Ripple="false" Color="Color.Inherit" OnClick="@((e) => FourthClick())" />
-            }
-            else
-            {
-                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Person" Color="Color.Inherit" OnClick="@((e) => FourthClick())" />
-            }
-        </div>
-    </MudAppBar>
-    <MudDrawer @bind-Open="@_drawerOpen"> 
+<div class="phone-view-outer">
+    <div class="phone-view">
+        <MudLayout> 
+            <div class="top-appbar">
+                <MudAppBar Class="px-0">
+                    <h2>PageTitle</h2>
+                    <MudButton OnClick="@(() => ProfileDrawerToggle(Anchor.End))">
+                        <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">@data.currentUser.Username.ToUpper().Substring(0, 1)</MudAvatar>
+                    </MudButton>
 
-    </MudDrawer>
-    <MudMainContent>
-        @Body
-    </MudMainContent>
-</MudLayout>
+                </MudAppBar>
+            </div>
+            <MudAppBar Bottom="true" Class="px-0">
+                <div class="d-flex flex-grow-1 justify-space-evenly no-hover">
+                    @if (firstOpen)
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Article" Ripple="false" Color="Color.Inherit" OnClick="@((e) => MyStuff_Click())" />
+                            <p class="icon-text">My Stuff</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Article" Color="Color.Inherit" OnClick="@((e) => MyStuff_Click())" />
+                            <p class="icon-text">My Stuff</p>
+                        </div>
+                    }
+                    @if (secondOpen)
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircle" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
+                            <p class="icon-text">Practice</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
+                            <p class="icon-text">Practice</p>
+                        </div>
+                    }
+                    <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Search_Click())" />
+                    @if (thirdOpen)
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Book" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Bible_Click())" />
+                            <p class="icon-text">Bible</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Book" Color="Color.Inherit" OnClick="@((e) => Bible_Click())" />
+                            <p class="icon-text">Bible</p>
+                        </div>
+                    }
+                    @if (fourthOpen)
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Person" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
+                            <p class="icon-text">Community</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="icon-div">
+                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Person" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
+                            <p class="icon-text">Community</p>
+                        </div>
+                    }
+                </div>
+            </MudAppBar>
+
+
+            <MudDrawer @bind-Open="@profileDrawerOpen" Style="padding: 15px;" Anchor="Anchor.End">
+                <div class="button">
+                    <MudButton OnClick="Signout_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Sign out</MudButton>
+                </div>
+            </MudDrawer>
+
+
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+    </div>
+</div>
 
 @code {
     private bool _isDarkMode;
@@ -61,56 +103,56 @@
     NavigationManager nav { get; set; }
     [Inject]
     DataService dataservice { get; set; }
+    [Inject]
+    Data data { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var token = await GetTokenAsync();
+        var token = await localStorage.GetItemAsync<string>("authToken");
 
         if (string.IsNullOrWhiteSpace(token))
         {
-            nav.NavigateTo("/authentication/login");
+            Console.WriteLine("token is null");
+            //nav.NavigateTo("/authentication/login");
             return;
         }
 
         try
         {
-            await dataservice.LoginUserWithTokenAsync(token);
-            if (dataservice.data.currentUser == null)
+            data.currentUser = await dataservice.LoginUserWithTokenAsync(token);
+            if (data.currentUser == null)
             {
-                nav.NavigateTo("/authentication/login");
+                Console.WriteLine("currentUser is null.");
+                //nav.NavigateTo("/authentication/login");
+            }
+            else
+            {
+                Console.WriteLine($"Logged in with token. UserId = {data.currentUser.Id}");
             }
         }
-        catch
+        catch (Exception ex)
         {
-            nav.NavigateTo("/authentication/login");
+            Console.WriteLine(ex.Message);
+            //nav.NavigateTo("/authentication/login");
         }
     }
 
-
-    private async Task SaveTokenAsync(string token)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        await localStorage.SetItemAsync("authToken", token);
+        if (firstRender)
+        {
+            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+            StateHasChanged();
+        }
     }
 
-    private async Task<string> GetTokenAsync()
+    bool profileDrawerOpen = false;
+    private Anchor anchor;
+
+    void ProfileDrawerToggle(Anchor _anchor)
     {
-        return await localStorage.GetItemAsync<string>("authToken");
-    }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender)
-    // {
-    //     if (firstRender)
-    //     {
-    //         _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
-    //         StateHasChanged();
-    //     }
-    // }
-
-    bool _drawerOpen = false;
-
-    void DrawerToggle()
-    {
-        _drawerOpen = !_drawerOpen;
+        profileDrawerOpen = !profileDrawerOpen;
+        anchor = _anchor;
     }
 
     private bool firstOpen = true;
@@ -118,7 +160,7 @@
     private bool thirdOpen = false;
     private bool fourthOpen = false;
 
-    private void FirstClick()
+    private void MyStuff_Click()
     {
         firstOpen = true;
         secondOpen = false;
@@ -126,7 +168,7 @@
         fourthOpen = false;
     }
 
-    private void SecondClick()
+    private void Practice_Click()
     {
         firstOpen = false;
         secondOpen = true;
@@ -134,7 +176,12 @@
         fourthOpen = false;
     }
 
-    private void ThirdClick()
+    private void Search_Click()
+    {
+
+    }
+
+    private void Bible_Click()
     {
         firstOpen = false;
         secondOpen = false;
@@ -142,12 +189,19 @@
         fourthOpen = false;
     }
 
-    private void FourthClick()
+    private void Community_Click()
     {
         firstOpen = false;
         secondOpen = false;
         thirdOpen = false;
         fourthOpen = true;
         nav.NavigateTo("/profile");
+    }
+
+    private async Task Signout_Click()
+    {
+        data.currentUser = null;
+        await localStorage.ClearAsync();
+        nav.NavigateTo("/authentication/login");
     }
 }

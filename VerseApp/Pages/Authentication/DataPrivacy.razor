@@ -1,4 +1,6 @@
-﻿@page "/"
+﻿@page "/authentication/dataprivacy"
+@layout NoNav
+@inject IDialogService DialogService
 
 <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
     <MudProgressLinear Color="Color.Primary" Style="width: 50%; margin-bottom: 15px; margin-top: -35px; margin-right: 5px;" Indeterminate="true" />
@@ -23,14 +25,18 @@
                 <p style="margin-left: 5px;">@errorMessage</p>
             </div>
         }
-        @if (data.currentUser == null)
+        <h3 style="text-align: center; margin-bottom: 10%;">Data Privacy</h3>
+        <p>We are committed to keeping your data secure and private. You password is hashed right when you create it to keep it confidential. </p>
+        <p>We guarantee secure processing, transfer, storage of all your data and will never sell or share any of your data or activity on the platform.</p>
+        <p>By creating an account you acknowledge agreement with this policy.</p>
+        @if (!string.IsNullOrEmpty(message))
         {
-            <h3 style="text-align: center; margin-bottom: 10%;">Please sign in to your account</h3>
-
+            <div style="margin-top: -25px;">
+                <p>@message</p>
+            </div>
         }
-        else
-        {
-            
-        }
+        <div class="button">
+            <MudButton OnClick="Back_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Back</MudButton>
+        </div>
     </MudStack>
 </div>

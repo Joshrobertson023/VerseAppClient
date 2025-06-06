@@ -19,7 +19,7 @@ builder.Services.AddHttpClient("api", client =>
 builder.Services.AddMudServices();
 builder.Services.AddScoped<DataService>();
 builder.Services.AddSingleton<Data>();
-builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 builder.Services.AddMudServices(service =>
 {

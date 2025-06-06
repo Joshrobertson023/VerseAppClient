@@ -47,6 +47,49 @@
     flex-direction: column;
 }
 
+html, body, #app {
+    width: 100%;
+    height: 100%;
+}
+
+.phone-view {
+    max-width: 500px !important;
+    max-height: 1000px !important;
+    width: 100%;
+    height: 100%;
+    margin: 0 !important;
+    outline: 3px solid #5575aa;
+    outline-offset: 9px;
+}
+
+.phone-view-outer {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 !important;
+}
+
+.icon-div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: -10px;
+}
+
+.top-appbar .mud-toolbar-appbar {
+    width: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.icon-text {
+    margin-top: -8px;
+    z-index: 2;
+}
+
 .button {
     width: 100%;
     display: flex;

@@ -1,1 +1,88 @@
 ﻿@page "/authentication/createaccount"
+@layout NoNav
+@inject IDialogService DialogService
+@namespace VerseApp.Pages.Authentication
+
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay>
+
+
+<div class="single-stack">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 70%;">
+        <h1 style="text-align: center; margin-bottom: 25%; margin-top: 25%;">VerseApp</h1>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+                <p style="margin-left: 5px;">@errorMessage</p>
+            </div>
+        }
+        <h3 style="text-align: center; margin-bottom: 10%;">Create an account</h3>
+        <div class="button">
+            <MudTextField @bind-Value="firstName" Label="First name" MaxLength="15" Variant="Variant.Outlined" Required="true"></MudTextField>
+        </div>
+        <div class="button">
+            <MudTextField @bind-Value="lastName" Label="Last name" MaxLength="15" Variant="Variant.Outlined" Required="true"></MudTextField>
+        </div>
+        <div class="button">
+            <MudTextField @onfocus="GenerateUsername" @bind-Value="username" MaxLength="18" Label="Create a username" Variant="Variant.Outlined" Required="true"></MudTextField>
+        </div>
+        @if (!NoEmail_Checkbox)
+        {
+            <div class="button">
+                <MudTextField @bind-Value="email" Label="Enter your email address" MaxLength="50" Variant="Variant.Outlined"></MudTextField>
+            </div>
+            <div class="button">
+                <MudCheckBox @bind-Value="@NoEmail_Checkbox" Color="Color.Secondary"></MudCheckBox>
+                <p>Continue without email</p>
+            </div>
+            <div class="button">
+                <MudButton OnClick="DataPrivacy_Click" Variant="Variant.Text" FullWidth="true" Color="Color.Secondary" Style="text-decoration: underline;" Size="Size.Small" Class="ml-auto">Data Privacy</MudButton>
+            </div>
+        }
+        else
+        {
+            <div class="button">
+                <p style="text-align: center;">In case your need to recover your account, please choose a security question.</p>
+            </div>
+            <MudSelect @bind-Value="@securityQuestion"
+                       Label="Choose a security question">
+                @foreach (var question in securityQuestions)
+                {
+                    <MudSelectItem Value="@question">@question</MudSelectItem>
+                }
+            </MudSelect>
+            <div class="button">
+                <MudTextField @bind-Value="@securityAnswer" Label="Answer" MaxLength="20" Variant="Variant.Outlined"></MudTextField>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div style="margin-top: -55px; margin-bottom: 30px;">
+                <p>@message</p>
+            </div>
+        }
+        <div class="button">
+            <MudButton OnClick="Continue_Click" Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" Class="ml-auto">Continue</MudButton>
+        </div>
+
+        <div class="button">
+            <MudButton OnClick="Back3_Click" Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true" Class="ml-auto">Back</MudButton>
+        </div>
+    </MudStack>
+</div>
