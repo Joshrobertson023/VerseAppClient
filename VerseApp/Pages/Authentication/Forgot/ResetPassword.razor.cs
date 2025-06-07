@@ -10,13 +10,14 @@ namespace VerseApp.Pages.Authentication.Forgot
     public partial class ResetPassword : ComponentBase
     {
         [Parameter]
-        [SupplyParameterFromQuery(Name = "token")]
         public string token { get; set; }
         [Parameter]
-        [SupplyParameterFromQuery(Name = "username")]
         public string username { get; set; }
         [Inject]
         DataService dataservice { get; set; }
+
+        [Inject]
+        private NavigationManager Nav { get; set; }
         private string errorMessage;
         private string password;
         private string repeatPassword;
@@ -27,7 +28,7 @@ namespace VerseApp.Pages.Authentication.Forgot
         private string securityAnswer;
         private string securityQuestion;
         private bool resetLinkSent = false;
-        private bool validToken;
+        private bool validToken = false;
         private string message;
 
         #region passwordTextField
@@ -70,23 +71,42 @@ namespace VerseApp.Pages.Authentication.Forgot
 
         }
 
+        protected override async Task OnParametersSetAsync()
+        {
+            try
+            {
+                validToken = await dataservice.VerifyTokenDBAsync(username, token);
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "Unable to verify reset link. Please try again later.";
+            }
+        }
+
         private async Task ResetPassword_Click()
         {
-            if (password.Trim() != repeatPassword.Trim())
-            {
-                message = "Passwords do not match.";
-                return;
-            }
+            try
+            { 
+                if (password.Trim() != repeatPassword.Trim())
+                {
+                    message = "Passwords do not match.";
+                    return;
+                }
 
-            overlayVisible = true;
-            progress = 67;
-            await Task.Delay(200);
-            int userId = await dataservice.GetIdFromUsername(username.Trim());
-            progress = 89;
-            await Task.Delay(200);
-            await dataservice.UpdateUserPassword(userId, PasswordHash.CreateHash(password.Trim()));
-            overlayVisible = false;
-            message = "Go back to the original window to sign in.";
+                overlayVisible = true;
+                progress = 67;
+                await Task.Delay(200);
+                int userId = await dataservice.GetIdFromUsername(username.Trim());
+                progress = 89;
+                await Task.Delay(200);
+                await dataservice.UpdateUserPassword(userId, PasswordHash.CreateHash(password.Trim()));
+                overlayVisible = false;
+                message = "Go back to the original window to sign in.";
+            }
+            catch (Exception ex)
+            {
+                errorMessage = "We ran into an error. Please try again.";
+            }
         }
     }
 }

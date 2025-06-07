@@ -22,10 +22,6 @@ namespace VerseApp.Pages.Authentication
         public string lastName { get; set; }
         [Parameter]
         public string? email { get; set; }
-        [Parameter]
-        public string? securityQuestion { get; set; }
-        [Parameter]
-        public string? securityAnswer { get; set; }
         private string errorMessage;
         private string message;
         private string password;
@@ -123,32 +119,28 @@ namespace VerseApp.Pages.Authentication
                 {
                     email = email.Trim();
                 }
-                else
-                {
-                    securityQuestion = securityQuestion.Trim();
-                    securityAnswer = securityAnswer.Trim();
-                }
 
                     Guid guid = Guid.NewGuid();
                 string token = guid.ToString();
-                progress = 89;
+                progress = 34;
+                overlayMessage = "Hashing your password...";
                 StateHasChanged();
                 await Task.Delay(200);
                 string hashedPassword = PasswordHash.CreateHash(password.Trim());
 
-                progress = 92;
+                progress = 87;
+                overlayMessage = "Pushing account to database...";
                 StateHasChanged();
                 await Task.Delay(200);
                 await dataservice.AddUserAsync(new UserModel(username.Trim(), 
                                                              firstName.Trim(), 
                                                              lastName.Trim(), 
-                                                             email, 
-                                                             securityQuestion, 
-                                                             securityAnswer,
+                                                             email,
                                                              hashedPassword,
                                                              token));
 
-                progress = 98;
+                progress = 97;
+                overlayMessage = "Saving your local token...";
                 StateHasChanged();
                 await Task.Delay(200);
                 await localStorage.ClearAsync();

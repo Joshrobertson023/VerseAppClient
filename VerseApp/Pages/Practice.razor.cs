@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace VerseApp.Pages
 {
-    public partial class MyVerses : ComponentBase
+    public partial class Practice : ComponentBase
     {
         [Inject]
         NavigationManager nav { get; set; }
@@ -13,6 +13,7 @@ namespace VerseApp.Pages
         Data data { get; set; }
         public bool addingVerse { get; set; }
         private bool loading { get; set; }
+        private int progress;
         private string overlayMessage { get; set; }
         private string errorMessage { get; set; }
 

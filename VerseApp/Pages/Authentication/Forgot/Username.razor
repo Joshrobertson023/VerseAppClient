@@ -33,7 +33,7 @@
                 <p style="margin-left: 5px;">@errorMessage</p>
             </div>
         }
-        <h3 style="text-align: center; margin-bottom: 10%;">Enter your name and password to see your username:</h3>
+        <h3 style="text-align: center; margin-bottom: 10%;">Enter your name and password to get your username:</h3>
         <div class="button">
             <MudTextField @bind-Value="firstName" Label="First name" Variant="Variant.Outlined"></MudTextField>
         </div>
@@ -41,11 +41,11 @@
             <MudTextField @bind-Value="lastName" Label="Last name" Variant="Variant.Outlined"></MudTextField>
         </div>
         <div class="button" style="margin-top: -30px;">
-            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+            <MudTextField @bind-Value="email" Label="Email" Variant="Variant.Outlined"/>
         </div>
         @if (!string.IsNullOrEmpty(message))
         {
-            <div style="margin-top: -25px;">
+            <div style="margin-top: -5px;">
                 <p>@message</p>
             </div>
         }
@@ -53,7 +53,7 @@
             <MudButton OnClick="RecoverUsername_Click" Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" Class="ml-auto">Recover username</MudButton>
         </div>
         <div class="button">
-            <MudButton OnClick="ForgotPasswordUsername_Click" Variant="Variant.Text" Color="Color.Secondary" FullWidth="true" Class="ml-auto">Forgot Password</MudButton>
+            <MudButton OnClick="BackToLogin_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Back to Login</MudButton>
         </div>
     </MudStack>
 </div>

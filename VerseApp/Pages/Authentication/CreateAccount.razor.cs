@@ -106,17 +106,14 @@ namespace VerseApp.Pages.Authentication
                 progress = 0;
                 overlayVisible = true;
                 progress = 37;
-                overlayMessage = "Getting all usernames...";
+                overlayMessage = "Checking usernames...";
                 await Task.Delay(1);
-                await dataservice.GetAllUsernames();
+                bool exists = await dataservice.GetAllUsernames(username.Trim());
                 progress = 78;
                 overlayMessage = "Checking if your username is available...";
                 await Task.Delay(1);
-                data.usernames.Sort();
-                username = username.Trim();
-                int index = data.usernames.BinarySearch(username);
 
-                if (index >= 0)
+                if (exists)
                 {
                     message = "Username already exists.";
                     overlayVisible = false;
@@ -137,12 +134,23 @@ namespace VerseApp.Pages.Authentication
                 progress = 100;
                 overlayMessage = "Done!";
                 await Task.Delay(1);
-                nav.NavigateTo($"/authentication/createpassword/{firstName}/{lastName}/{username}/{email}/{securityQuestion}/{securityAnswer}");
+                nav.NavigateTo($"/authentication/createpassword/{firstName}/{lastName}/{username}/{email}");
             }
             catch (Exception ex)
             {
-                overlayVisible = false;
-                errorMessage = "We encountered an error. Please try again. " + ex.Message;
+                errorMessage = ex.Message;
+                if (errorMessage.ToLower().Contains("timed out"))
+                {
+                    errorMessage = "Connection timed out.";
+                    retryCount++;
+                    overlayMessage = $"We had trouble connecting.\nRetrying ({retryCount})...";
+                    await Continue_Click();
+                }
+                else
+                {
+                    errorMessage = "We encountered an error. Please try again. " + ex.Message;
+                    overlayVisible = false;
+                }
             }
         }
 

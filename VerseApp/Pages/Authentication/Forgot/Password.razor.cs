@@ -25,14 +25,11 @@ namespace VerseApp.Pages.Authentication.Forgot
         [Inject]
         DataService dataservice { get; set; }
         private string errorMessage;
-        private string message;
         private string username;
+        private string message = string.Empty;
         private string? email;
         private string overlayMessage;
         private int progress = 0;
-        private bool NoEmail_Checkbox { get; set; }
-        private string securityAnswer;
-        private string securityQuestion;
         private bool resetLinkSent = false;
 
         #region passwordTextField
@@ -79,49 +76,67 @@ namespace VerseApp.Pages.Authentication.Forgot
         {
 
         }
-        private async Task GetSecurityQuestion_Click()
-        {
-            securityQuestion = await dataservice.GetSecurityQuestion(username.Trim());
-        }
-
         private async Task Continue_Click()
         {
-            try
-            {
-                RecoveryInfo userRecovering = new RecoveryInfo();
-                userRecovering.Username = username.Trim();
-                var _email = new MailAddress(email);
-                string token = Guid.NewGuid().ToString();
-                string resetUrl = $"https://localhost:7093/resetpassword?token={token}&username={userRecovering.Username}";
-
-                var sendingAddress = new MailAddress("therealjoshrobertson@gmail.com");
-                string subject = "Reset Your Password";
-                string body = $"Click the link below to reset your password:\n\n{resetUrl}";
-
-                var smtp = new SmtpClient
+            //try
+            //{
+                if (string.IsNullOrWhiteSpace(email))
                 {
-                    Host = "smtp.gmail.com",
-                    Port = 587,
-                    EnableSsl = true,
-                    DeliveryMethod = SmtpDeliveryMethod.Network,
-                    UseDefaultCredentials = false,
-                    Credentials = new NetworkCredential("therealjoshrobertson@gmail.com", "tofp kaki lkuv nffh") // Change emailPassword for prod
-                };
-
-                using var message = new MailMessage(sendingAddress, _email)
+                    message = "Please enter your email.";
+                    return;
+                }
+                if (string.IsNullOrWhiteSpace(username))
                 {
-                    Subject = subject,
-                    Body = body
-                };
+                    message = "Please enter your username.";
+                    return;
+                }
 
-                await smtp.SendMailAsync(message);
-                await dataservice.PutResetToken(username, token);
-                resetLinkSent = true;
-            }
-            catch (Exception ex)
-            {
-                errorMessage = ex.Message;
-            }
+                overlayVisible = true;
+                progress = 23;
+                overlayMessage = "Searching for your info...";
+                await Task.Delay(200);
+                message = "";
+                errorMessage = "";
+                await dataservice.GetRecoveryInfo();
+
+                if (data.recoveryInfo == null || data.recoveryInfo.Count == 0)
+                {
+                    message = "No recovery records found.";
+                    overlayVisible = false;
+                    return;
+                }
+                string debug = "";
+                progress = 84;
+                overlayMessage = "Searching for your info...";
+                await Task.Delay(200);
+                foreach (var _recoveryInfo in data.recoveryInfo)
+                {
+                    debug = "";
+                    if (_recoveryInfo.Username == username.Trim() && email == _recoveryInfo.Email)
+                    {
+                        progress = 100;
+                        overlayMessage = "Done!";
+                        await Task.Delay(200);
+                        overlayVisible = false;
+                        await dataservice.SendResetLink(username.Trim(), email.Trim());
+                        message = "Check your inbox for the reset link.";
+                        return;
+                    }
+                }
+                message = "There is no-one in our records with that email and username.";
+                progress = 0;
+                overlayMessage = "";
+                overlayVisible = false;
+            //}
+            //catch (Exception ex)
+            //{
+            //    errorMessage = ex.Message;
+            //}
+        }
+
+        private void BackToLogin_Click()
+        {
+            nav.NavigateTo("/authentication/login");
         }
     }
 }

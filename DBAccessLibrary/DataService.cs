@@ -15,15 +15,14 @@ namespace DBAccessLibrary
     {
         string baseAPIUrl = "https://localhost:7070/api";
 
-        private IHttpClientFactory factory;
+        private HttpClient http;
         public Data data;
-        public DataService(IHttpClientFactory _factory, Data _data)
+        public DataService(HttpClient _http, Data _data)
         {
-            factory = _factory;
+            http = _http;
             data = _data;
         }
 
-        private HttpClient http => factory.CreateClient("api");
 
         public event Action<string> OnStatusChanged;
         protected void RaiseStatus(string message) => OnStatusChanged?.Invoke(message);
@@ -60,37 +59,37 @@ namespace DBAccessLibrary
             }
         }
 
-        public async Task GetAllUsernames()
+        public async Task<bool> GetAllUsernames(string username)
         {
+            bool result = false;
+
             try
             {
-                var response = await http.GetAsync("api/user/usernames");
+                var response = await http.PostAsJsonAsync("api/user/usernames", username);
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var rawError = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"GetAllUsernames failed ({(int)response.StatusCode}): {rawError}");
-
-                    data.usernames = new List<string>();
-                    return;
+                    Console.WriteLine($"CheckForUsername failed ({(int)response.StatusCode}): {rawError}");
+                    return false;
                 }
 
                 try
                 {
-                    data.usernames = await response.Content.ReadFromJsonAsync<List<string>>();
+                    result = await response.Content.ReadFromJsonAsync<bool>();
+                    return result;
                 }
                 catch (Exception jsonEx)
                 {
                     var rawBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Failed to parse JSON in GetAllUsernames: {jsonEx.Message}\nBody was:\n{rawBody}");
-
-                    data.usernames = new List<string>();
+                    Console.WriteLine($"Failed to parse JSON in CheckForUsername: {jsonEx.Message}\nBody was:\n{rawBody}");
+                    return false;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in GetAllUsernames: {ex.Message}");
-                data.usernames = new List<string>();
+                Console.WriteLine($"Exception in CheckForUsername: {ex.Message}");
+                return false;
             }
         }
 
@@ -163,10 +162,7 @@ namespace DBAccessLibrary
 
         public async Task<bool> VerifyTokenDBAsync(string username, string token)
         {
-            RecoveryInfo recovery = new RecoveryInfo();
-            recovery.Username = username;
-            recovery.Token = token;
-            var response = await http.PostAsJsonAsync($"api/user/verifytoken", recovery);
+            var response = await http.PostAsJsonAsync($"api/user/verifytoken", new {Username = username, Token = token});
             if (!response.IsSuccessStatusCode)
             {
                 var payload = await response.Content.ReadAsStringAsync();
@@ -203,10 +199,7 @@ namespace DBAccessLibrary
 
         public async Task UpdateUserPassword(int userId, string passwordHash)
         {
-            RecoveryInfo recovery = new RecoveryInfo();
-            recovery.Id = userId;
-            recovery.PasswordHash = passwordHash;
-            var response = await http.PostAsJsonAsync($"api/user/updatepassword", recovery);
+            var response = await http.PostAsJsonAsync($"api/user/updatepassword", new {Id = userId, PasswordHash = passwordHash});
             if (!response.IsSuccessStatusCode)
             {
                 var payload = await response.Content.ReadAsStringAsync();
@@ -216,7 +209,17 @@ namespace DBAccessLibrary
 
         public async Task GetRecoveryInfo()
         {
-            data.recoveryInfo = await http.GetFromJsonAsync<List<RecoveryInfo>>($"api/user/getrecoveryinfo");
+            var list = await http.GetFromJsonAsync<List<RecoveryInfo>>("api/user/getrecoveryinfo");
+
+            data.recoveryInfo = list ?? new List<RecoveryInfo>();
+        }
+
+        public async Task SendResetLink(string username, string email)
+        {
+            var dto = new {Username = username, Email = email };
+
+            var response = await http.PostAsJsonAsync("api/user/sendresetlink", dto);
+            response.EnsureSuccessStatusCode();
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DBAccessLibrary.Models
@@ -21,9 +22,6 @@ namespace DBAccessLibrary.Models
             get { return username; }
             set
             {
-                if (value.Length > UsernameMax)
-                    throw new ArgumentException($"Username is too long. Please enter a username under {UsernameMax + 1} characters.");
-
                 username = value;
             }
         }
@@ -33,9 +31,6 @@ namespace DBAccessLibrary.Models
             get { return firstName; }
             set
             {
-                if (value.Length > NameMax)
-                    throw new ArgumentException($"First name is too long. Please enter a name under {NameMax + 1} characters.");
-
                 firstName = value.ToLower();
             }
         }
@@ -45,12 +40,10 @@ namespace DBAccessLibrary.Models
             get { return lastName; }
             set
             {
-                if (value.Length > NameMax)
-                    throw new ArgumentException($"Last name is too long. Please enter a name under {NameMax + 1} characters");
-
                 lastName = value.ToLower();
             }
         }
+        [JsonIgnore]
         public string FullName
         {
             get
@@ -63,16 +56,10 @@ namespace DBAccessLibrary.Models
         {
             get
             {
-                if (string.IsNullOrEmpty(email))
-                    throw new NullReferenceException("Error getting Email: email is null or empty.");
-                else
                     return email;
             }
             set
             {
-                if (value.Length > EmailMax)
-                    throw new ArgumentException($"Email is too long. Please enter an email under {EmailMax + 1} characters.");
-
                 email = value;
             }
         }
@@ -82,9 +69,6 @@ namespace DBAccessLibrary.Models
             get { return passwordHash; }
             set
             {
-                if (value.Length > PasswordMax)
-                    throw new ArgumentException($"Critical error setting PasswordHash: PasswordHash is too long.");
-
                 passwordHash = value;
             }
         }

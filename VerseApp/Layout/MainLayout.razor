@@ -10,9 +10,35 @@
 <div class="phone-view-outer">
     <div class="phone-view">
         <MudLayout> 
+
+
             <div class="top-appbar">
-                <MudAppBar Class="px-0">
-                    <h2>PageTitle</h2>
+                <MudAppBar Class="px-0 py-0">
+
+                    @if (firstOpen)
+                    {
+                        <MudTabs Elevation="2" Rounded="true" ActivePanelIndexChanged="@(index => SetMyStuffPage(index))">
+                            <MudTabPanel Style="background-color: transparent !important; width: 25% !important;" Text="Collections"></MudTabPanel>
+                            <MudTabPanel Style="background-color: transparent !important; width: 25% !important;" Text="Plans"></MudTabPanel>
+                        </MudTabs>
+                    }
+                    else if (secondOpen)
+                    {
+                        <h3>PageTitle</h3>
+                    }
+                    else if (thirdOpen)
+                    {
+                        <h3>PageTitle</h3>
+                    }
+                    else if (fourthOpen)
+                    {
+                        <h3>PageTitle</h3>
+                    }
+                    else // Search
+                    {
+                        <h3>PageTitle</h3>
+                    }
+)
                     <MudButton OnClick="@(() => ProfileDrawerToggle(Anchor.End))">
                         @if (!string.IsNullOrEmpty(data.currentUser?.Username))
                         {
@@ -27,9 +53,16 @@
                     </MudButton>
 
                 </MudAppBar>
+)
             </div>
-            <MudAppBar Bottom="true" Class="px-0">
-                <div class="d-flex flex-grow-1 justify-space-evenly no-hover">
+
+
+            <div class="bottom-appbar">
+            <MudAppBar Bottom="true" Class="px-0 py-0" Style="height:75px !important;
+                                                               display:flex;
+                                                               align-items:center;
+                                                               justify-content:space-evenly;">
+                <div class="d-flex flex-grow-1 no-hover" style="align-items: center; justify-content: space-between; width: 100%;">
                     @if (firstOpen)
                     {
                         <div class="icon-div">
@@ -90,6 +123,8 @@
                 </div>
             </MudAppBar>
 
+            </div>
+
 
             <MudDrawer @bind-Open="@profileDrawerOpen" Style="padding: 15px;" Anchor="Anchor.End">
                 <div class="button">
@@ -114,6 +149,7 @@
     DataService dataservice { get; set; }
     [Inject]
     Data data { get; set; }
+    private int activeIndex = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -175,6 +211,7 @@
         secondOpen = false;
         thirdOpen = false;
         fourthOpen = false;
+        nav.NavigateTo("/");
     }
 
     private void Practice_Click()
@@ -183,11 +220,16 @@
         secondOpen = true;
         thirdOpen = false;
         fourthOpen = false;
+        nav.NavigateTo("/practice");
     }
 
     private void Search_Click()
     {
-
+        firstOpen = false;
+        secondOpen = false;
+        thirdOpen = false;
+        fourthOpen = false;
+        nav.NavigateTo("/search");
     }
 
     private void Bible_Click()
@@ -196,6 +238,7 @@
         secondOpen = false;
         thirdOpen = true;
         fourthOpen = false;
+        nav.NavigateTo("/bible");
     }
 
     private void Community_Click()
@@ -204,7 +247,7 @@
         secondOpen = false;
         thirdOpen = false;
         fourthOpen = true;
-        nav.NavigateTo("/profile");
+        nav.NavigateTo("/community");
     }
 
     private async Task Signout_Click()
@@ -213,5 +256,18 @@
             data.currentUser = new DBAccessLibrary.Models.UserModel();
         await localStorage.ClearAsync();
         nav.NavigateTo("/authentication/login");
+    }
+
+    private void SetMyStuffPage(int index)
+    {
+        activeIndex = index;
+        if (index == 0)
+        {
+            nav.NavigateTo("/");
+        }
+        else if (index == 1)
+        {
+            nav.NavigateTo("/mystuff/plans");
+        }
     }
 }

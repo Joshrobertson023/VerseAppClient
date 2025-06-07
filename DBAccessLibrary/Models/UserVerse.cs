@@ -6,15 +6,15 @@ using System.Threading.Tasks;
 
 namespace DBAccessLibrary.Models
 {
-    public class UserVerseModel
+    public class UserVerse
     {
         public int VerseId { get; set; }
         public int UserId { get; set; }
-        public int CategoryId { get; set; }
+        public int CollectionId { get; set; }
         public string Reference { get; set; }
         public DateTime LastPracticed { get; set; }
         public DateTime DateMemorized { get; set; }
-        public string Translation { get; set; }
+        public DateTime DateAdded { get; set; }
         public float ProgressPercent { get; set; }
         public int TimesReviewed { get; set; }
         public int TimesMemorized { get; set; }

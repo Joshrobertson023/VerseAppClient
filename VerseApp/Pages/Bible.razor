@@ -1,0 +1,42 @@
+﻿@page "/bible"
+
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay>
+
+
+<div class="single-stack">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 70%;">
+        <h1 style="text-align: center; margin-bottom: 25%; margin-top: 25%;">VerseApp</h1>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+                <p style="margin-left: 5px;">@errorMessage</p>
+            </div>
+        }
+        @if (data.currentUser == null)
+        {
+            <h3 style="text-align: center; margin-bottom: 10%;">Please sign in to your account</h3>
+
+        }
+        else
+        {
+            <h3 style="text-align: center; margin-bottom: 10%;">My Stuff</h3>
+        }
+    </MudStack>
+</div>

@@ -33,47 +33,24 @@
             </div>
         }
         <h3 style="text-align: center; margin-bottom: 10%;">Create an account</h3>
-        <div class="button">
+        <div class="button" style="margin-bottom: -15px;">
             <MudTextField @bind-Value="firstName" Label="First name" MaxLength="15" Variant="Variant.Outlined" Required="true"></MudTextField>
         </div>
-        <div class="button">
+        <div class="button" style="margin-bottom: -15px;">
             <MudTextField @bind-Value="lastName" Label="Last name" MaxLength="15" Variant="Variant.Outlined" Required="true"></MudTextField>
         </div>
-        <div class="button">
+        <div class="button" style="margin-bottom: -15px;">
             <MudTextField @onfocus="GenerateUsername" @bind-Value="username" MaxLength="18" Label="Create a username" Variant="Variant.Outlined" Required="true"></MudTextField>
         </div>
-        @if (!NoEmail_Checkbox)
-        {
-            <div class="button">
+        <div class="button" style="margin-bottom: -5px;">
                 <MudTextField @bind-Value="email" Label="Enter your email address" MaxLength="50" Variant="Variant.Outlined"></MudTextField>
-            </div>
-            <div class="button">
-                <MudCheckBox @bind-Value="@NoEmail_Checkbox" Color="Color.Secondary"></MudCheckBox>
-                <p>Continue without email</p>
             </div>
             <div class="button">
                 <MudButton OnClick="DataPrivacy_Click" Variant="Variant.Text" FullWidth="true" Color="Color.Secondary" Style="text-decoration: underline;" Size="Size.Small" Class="ml-auto">Data Privacy</MudButton>
             </div>
-        }
-        else
-        {
-            <div class="button">
-                <p style="text-align: center;">In case your need to recover your account, please choose a security question.</p>
-            </div>
-            <MudSelect @bind-Value="@securityQuestion"
-                       Label="Choose a security question">
-                @foreach (var question in securityQuestions)
-                {
-                    <MudSelectItem Value="@question">@question</MudSelectItem>
-                }
-            </MudSelect>
-            <div class="button">
-                <MudTextField @bind-Value="@securityAnswer" Label="Answer" MaxLength="20" Variant="Variant.Outlined"></MudTextField>
-            </div>
-        }
         @if (!string.IsNullOrEmpty(message))
         {
-            <div style="margin-top: -55px; margin-bottom: 30px;">
+            <div>
                 <p>@message</p>
             </div>
         }

@@ -11,13 +11,11 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddHttpClient("api", client =>
+builder.Services.AddHttpClient<DataService>(client =>
 {
     client.BaseAddress = new Uri("https://localhost:7070/");
 });
 
-builder.Services.AddMudServices();
-builder.Services.AddScoped<DataService>();
 builder.Services.AddSingleton<Data>();
 builder.Services.AddBlazoredLocalStorageAsSingleton();
 
@@ -53,7 +51,7 @@ builder.Services.AddMudServices(service =>
             H1 = new H1Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "2rem",
+                FontSize = "3rem",
                 FontWeight = "500",
                 LineHeight = "1.6",
                 LetterSpacing = ".0075em"
@@ -85,25 +83,25 @@ builder.Services.AddMudServices(service =>
             H5 = new H5Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.25rem",
-                FontWeight = "400",
+                FontSize = "16px",
+                FontWeight = "200",
                 LineHeight = "1.4",
                 LetterSpacing = ".0075em"
             },
             H6 = new H6Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1rem",
-                FontWeight = "300",
-                LineHeight = "1.4",
+                FontSize = "3rem",
+                FontWeight = "200",
+                LineHeight = "1.6",
                 LetterSpacing = ".0075em"
             },
             Subtitle1 = new Subtitle1Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "0.85rem",
-                FontWeight = "300",
-                LineHeight = "1",
+                FontWeight = "200",
+                LineHeight = "1.5",
                 LetterSpacing = ".0075em"
             }
         }

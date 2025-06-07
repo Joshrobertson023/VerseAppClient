@@ -91,27 +91,28 @@ namespace VerseApp.Pages.Authentication
                 message = "";
                 errorMessage = "";
 
-                await dataservice.GetAllUsernames();
+                bool exists = await dataservice.GetAllUsernames(username.Trim());
 
-                data.usernames.Sort();
-                username = username.Trim();
-                int index = data.usernames.BinarySearch(username);
-
-                if (index < 0)
+                if (!exists)
                 {
                     message = "Username does not exist.";
                     overlayVisible = false;
+                    overlayMessage = "";
+                    progress = 0;
                     return;
                 }
 
                 progress = 55;
-                overlayMessage = "Checking password...";
+                overlayMessage = "Processing password...";
                 StateHasChanged();
                 await Task.Delay(200);
                 string passwordHash = await dataservice.GetPasswordHash(username);
                 if (!PasswordHash.VerifyHash(password.Trim(), passwordHash))
                 {
                     message = "Incorrect password.";
+                    overlayVisible = false;
+                    overlayMessage = "";
+                    progress = 0;
                     return;
                 }
 
@@ -121,6 +122,7 @@ namespace VerseApp.Pages.Authentication
                 await Task.Delay(200);
                 data.currentUser = new UserModel();
                 data.currentUser = await dataservice.GetUser(username);
+                // Get collections
                 if (data.currentUser == null)
                 {
                     errorMessage = "There was an error logging you in.";

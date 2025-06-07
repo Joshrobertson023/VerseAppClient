@@ -1,0 +1,83 @@
+﻿@page "/"
+@namespace VerseApp.Pages.MyStuff
+
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay>
+
+
+<div class="single-stack">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 70%;">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+                <p style="margin-left: 5px;">@errorMessage</p>
+            </div>
+        }
+        @if (data.currentUser == null)
+        {
+            <h3 style="text-align: center; margin-bottom: 10%;">Please sign in to your account</h3>
+
+        }
+        else
+        {
+            @if (reorganizing) // Get dropzone code later
+            {
+                <div id="top-add" style="display: flex; align-items: center; justify-content: space-between;">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton> 
+                </div>
+            }
+            else
+            {
+                <div id="top-add" style="display: flex; align-items: center; justify-content: space-between;">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Reorder</MudButton>
+                    <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Large" Color="Color.Secondary" /></MudButton>
+                </div>
+            }
+            <div id="collections">
+                @foreach (var collection in data.currentUser.Collections)
+                {
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@($"/mystuff/collections/{collection.Id}")" Class="collection">
+                        <div style="display: flex; flex-direction: column; width: 50%;">
+                            <h2>@collection.Title</h2>
+                            <p>@collection.NumVerses</p>
+                            <p>@collection.Visibility</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; width: 50%;">
+                            <MudButton Variant="Variant.Text" OnClick="@ToggleSettingsOpen">
+                                <MudIcon Icon="@Icons.Material.Filled.Edit" Title="Edit Collection" Size="Size.Small" Color="Color.Secondary" />
+                            </MudButton>
+                            <MudPopover Open="@open" Fixed="true" Class="px-4 pt-4">
+                                <div style="display: flex; position: absolute; flex-direction: column;">
+                                    <MudButton OnClick="@ToggleSettingsOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</MudButton>
+                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Share</MudButton>
+                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Publish</MudButton>
+                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Delete</MudButton>
+                                </div>
+                            </MudPopover>
+                            @if (collection.Author != data.currentUser.Username)
+                            {
+                                <p>@collection.Author</p>
+                            }
+                        </div>
+                    </MudButton>
+                }
+            </div>
+        }
+    </MudStack>
+</div>

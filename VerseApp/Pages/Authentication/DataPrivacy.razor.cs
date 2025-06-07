@@ -48,7 +48,7 @@ namespace VerseApp.Pages.Authentication
 
         private async Task Back_Click()
         {
-            await JSRuntime.InvokeVoidAsync("window.back");
+            await JSRuntime.InvokeVoidAsync("history.back");
         }
 
         private bool overlayVisible = false;

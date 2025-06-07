@@ -17,7 +17,7 @@ namespace VerseApp.Pages.Authentication.Forgot
         private string message;
         private string firstName;
         private string lastName;
-        private string password;
+        private string email;
         private int retryCount;
         private string overlayMessage;
         private int progress;
@@ -71,46 +71,59 @@ namespace VerseApp.Pages.Authentication.Forgot
                     message = "Please enter your last name.";
                     return;
                 }
-                if (string.IsNullOrWhiteSpace(password))
+                if (string.IsNullOrWhiteSpace(email))
                 {
-                    message = "Please enter your password.";
+                    message = "Please enter your email.";
                     return;
                 }
 
                 overlayVisible = true;
-                progress = 3;
-                overlayMessage = "Getting info from database...";
+                progress = 23;
+                overlayMessage = "Searching for your info...";
                 await Task.Delay(200);
                 message = "";
                 errorMessage = "";
                 await dataservice.GetRecoveryInfo();
 
                 string recoveryFullName = firstName.Trim().ToLower() + lastName.Trim().ToLower();
-                string hashedRecoveryPassword = PasswordHash.CreateHash(password.Trim());
+
                 string debug = "";
                 progress = 84;
                 overlayMessage = "Searching for your info...";
                 await Task.Delay(200);
+                List<string> usernames = new List<string>();
                 foreach (var _recoveryInfo in data.recoveryInfo)
                 {
                     debug = "";
-                    if (_recoveryInfo.FirstName + _recoveryInfo.LastName == recoveryFullName && PasswordHash.VerifyHash(password.Trim(), _recoveryInfo.PasswordHash))
+                    if (_recoveryInfo.FirstName + _recoveryInfo.LastName == recoveryFullName && email == _recoveryInfo.Email)
                     {
                         progress = 100;
                         overlayMessage = "Done!";
                         await Task.Delay(200);
                         overlayVisible = false;
-                        message = "Your username is " + _recoveryInfo.Username;
-                        return;
+                        usernames.Add(_recoveryInfo.Username);
                     }
-                    debug += _recoveryInfo.FullName + " | " + recoveryFullName + " Password check: " + PasswordHash.VerifyHash(password.Trim(), _recoveryInfo.PasswordHash).ToString();
                 }
 
-                progress = 100;
-                await Task.Delay(200);
-                overlayMessage = "Done!";
-                message = "Your name or password is incorrect." + " _recoveryInfo.FullName: " + debug;
-                overlayVisible = false;
+                if (usernames.Count == 0)
+                {
+                    progress = 100;
+                    await Task.Delay(200);
+                    overlayMessage = "Done!";
+                    message = "The email does not match that name on our files. " + debug;
+                    overlayVisible = false;
+                    return;
+                }
+                else if (usernames.Count == 1)
+                {
+                    message = $"Your username is {usernames[0]}";
+                    overlayVisible = false;
+                    return;
+                }
+                else
+                {
+                    message = $"Usernames found with that info: {string.Join(", ", usernames)}";
+                }
             }
             catch (Exception ex)
             {
@@ -119,47 +132,9 @@ namespace VerseApp.Pages.Authentication.Forgot
             }
         }
 
-        private async Task ForgotPasswordUsername_Click()
+        private void BackToLogin_Click()
         {
-            //            //try
-            //            //{
-            //            //    if (string.IsNullOrWhiteSpace(firstName))
-            //            //        throw new Exception("Please enter your first name.");
-            //            //    if (string.IsNullOrWhiteSpace(lastName))
-            //            //        throw new Exception("Please enter your last name.");
-            //            //    if (string.IsNullOrWhiteSpace(recoveryEmail))
-            //            //        throw new Exception("Please enter an email.");
-
-            //            //    loading = true;
-            //            //    message = "";
-            //            //    errorMessage = "";
-            //            //    List<RecoveryInfo> recoveryInfo = await userservice.GetRecoveryInfoDBAsync();
-
-            //            //    string recoveryFullName = firstName.Trim().ToLower() + lastName.Trim().ToLower();
-
-            //            //    foreach (var _recoveryInfo in recoveryInfo)
-            //            //    {
-            //            //        if (_recoveryInfo.FirstName + _recoveryInfo.LastName == recoveryFullName && PasswordHash.VerifyHash(recoveryEmail.Trim(), _recoveryInfo.Email))
-            //            //        {
-            //            //            await SendResetLink(_recoveryInfo);
-            //            //            loading = false;
-            //            //            return;
-            //            //        }
-            //            //    }
-
-            //            //    message = "That email does not match the one on file with your name.";
-            //            //    enteringName = true;
-            //            //    loading = false;
-            //            //}
-            //            //catch (Exception ex)
-            //            //{
-            //            //    errorMessage = ex.Message;
-            //            //}
-        }
-
-        private void CreateAnAccount_Click()
-        {
-            nav.NavigateTo("/authentication/createaccount");
+            nav.NavigateTo("/authentication/login");
         }
     }
 }
