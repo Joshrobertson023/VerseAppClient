@@ -1,0 +1,151 @@
+﻿@page "/mystuff/newcollection"
+@namespace VerseApp.Pages.MyStuff
+
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay>
+
+
+<div class="single-stack">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center" Style="width: 70%;">
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
+                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+                <p style="margin-left: 5px;">@errorMessage</p>
+            </div>
+        }
+        <div class="button">
+            <MudButton OnClick="Back_Click" Variant="Variant.Filled" FullWidth="true" Color="Color.Primary" Class="ml-auto">Back</MudButton>
+        </div>
+        <h3 style="text-align: center; margin-bottom: 10%;">New Collection</h3>
+        <div class="button">
+            <MudTextField @bind-Value="collectionName" Label="Collection Name" Variant="Variant.Text"></MudTextField>
+        </div>
+        @if (!string.IsNullOrEmpty(message))
+        {
+            <div style="margin-top: -25px;">
+                <p>@message</p>
+            </div>
+        }
+
+        @foreach (var userVerse in collectionVerses)
+        {
+            <div style="display: flex;">
+                <div style="display: flex; flex-direction: column; width: 90%;">
+                    <h2>@userVerse.Reference</h2>
+                    @foreach (var verse in userVerse.Verses)
+                    {
+                        <p>@verse.Text</p>
+                        <p>@verse.UsersSaved</p>
+                        <p>@verse.UsersMemorized</p>
+                    }
+                </div>
+                <div style="display: flex; flex-direction: column; height: 100%; width: 10%; align-items: center;">
+                    X
+                </div>
+            </div>
+        }
+
+        <div class="button">
+            <MudButton OnClick="@(() => OpenDrawer(Anchor.Top))" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Add Passage</MudButton>
+        </div>
+        <div class="button">
+            <MudButton OnClick="CreateCollection_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Create Collection</MudButton>
+        </div>
+    </MudStack>
+
+
+    <MudDrawer Style="" @bind-Open="@open" Anchor="@anchor" Elevation="1" Variant="@DrawerVariant.Temporary" OverlayAutoClose="@overlayAutoClose">
+        <div id="verse-drawer-select" style="display: flex; justify-content: flex-start;">
+            <MudSelect @bind-Value="book"
+                       Label="Book"
+                       Variant="Variant.Outlined"
+                       Style="width: 100px">
+                @foreach (var book in data.booksOfBible)
+                {
+                    <MudSelectItem Value="@book.ToString()">@book</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect T="int" @bind-Value="chapter"
+                       Variant="Variant.Outlined"
+                       Label="Chapter"
+                       Style="width: 100px;">
+                @for (int i = 1; i <= numChapters; i++)
+                {
+                    var localI = i;
+                    <MudSelectItem T="int" Value="@localI">@localI</MudSelectItem>
+                }
+            </MudSelect>
+
+            <MudSelect T="int"
+                       @bind-SelectedValues="selectedVerses"
+                       Variant="Variant.Outlined"
+                       Label="Verses"
+                       MultiSelection="true"
+                       Style="width: 100px">
+                @for (int i = 1; i <= numVerses; i++)
+                {
+                    var _i = i;
+                    <MudSelectItem T="int" Value="@_i">@_i</MudSelectItem>
+                }
+            </MudSelect>
+            <div class="button">
+                <MudButton OnClick="Apply_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Apply</MudButton>
+            </div>
+
+        </div>
+        <div id="drawer-search">
+            <div class="button custom">
+                <MudTextField Label="Search by reference, keywords, or exact phrase" OnKeyUp="CheckForEnterKey" @bind-Value="userSearch" Variant="Variant.Outlined" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Search" OnAdornmentClick="Search_Click" AdornmentAriaLabel="Search" />
+            </div>
+        </div>
+        <div id="drawer-passage" style="min-height: 200px; max-height: 600px; overflow-y: auto;">
+            @if (!string.IsNullOrEmpty(drawerMessage))
+            {
+                <h2>@drawerMessage</h2>
+            }
+            @if (drawerVerse != null)
+            {
+                <div style="display: flex;">
+                    <div style="display: flex; flex-direction: column; width: 90%;">
+                        <h2>@drawerVerse.Reference</h2>
+                        @foreach (var verse in drawerVerse.Verses)
+                        {
+                            <p>@verse.Reference</p>
+                            <p>@verse.Text</p>
+                            <p>@verse.UsersSaved</p>
+                            <p>@verse.UsersMemorized</p>
+                        }
+                    </div>
+                </div>
+            }
+            else
+            {
+                <h2>Select or search for a passage</h2>
+            }
+        </div>
+        <div id="drawer-add">
+            <MudButton OnClick="AddPassage_Click" Variant="Variant.Outlined" Color="Color.Secondary" FullWidth="true">Add Passage</MudButton>
+        </div>
+        <div class="button">
+            <MudButton OnClick="@(() => OpenDrawer(Anchor.Top))" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Close</MudButton>
+        </div>
+    </MudDrawer>
+
+</div>

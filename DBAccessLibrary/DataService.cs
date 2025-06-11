@@ -8,6 +8,7 @@ using DBAccessLibrary.Models;
 using DBAccessLibrary;
 using static System.Net.WebRequestMethods;
 using System.Net.Http.Headers;
+using VerseAppAPI.Models;
 
 namespace DBAccessLibrary
 {
@@ -46,6 +47,7 @@ namespace DBAccessLibrary
             }
         }
 
+        #region User Management
         public async Task<UserModel> GetUser(string username)
         {
             try
@@ -59,9 +61,10 @@ namespace DBAccessLibrary
             }
         }
 
-        public async Task<bool> GetAllUsernames(string username)
+        public async Task<int> GetAllUsernames(string username)
         {
-            bool result = false;
+            int result = 0;
+            bool _result = false;
 
             try
             {
@@ -71,25 +74,25 @@ namespace DBAccessLibrary
                 {
                     var rawError = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"CheckForUsername failed ({(int)response.StatusCode}): {rawError}");
-                    return false;
+                    return 2;
                 }
 
                 try
                 {
-                    result = await response.Content.ReadFromJsonAsync<bool>();
-                    return result;
+                    _result = await response.Content.ReadFromJsonAsync<bool>();
+                    return _result == true ? 1 : 0;
                 }
                 catch (Exception jsonEx)
                 {
                     var rawBody = await response.Content.ReadAsStringAsync();
                     Console.WriteLine($"Failed to parse JSON in CheckForUsername: {jsonEx.Message}\nBody was:\n{rawBody}");
-                    return false;
+                    return 2;
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Exception in CheckForUsername: {ex.Message}");
-                return false;
+                return 2;
             }
         }
 
@@ -221,5 +224,30 @@ namespace DBAccessLibrary
             var response = await http.PostAsJsonAsync("api/user/sendresetlink", dto);
             response.EnsureSuccessStatusCode();
         }
+        #endregion
+
+        #region Verse Management
+        public async Task<UserVerse> GetUserVerseByReferenceAsync(Reference reference)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/getuserversebyreference", reference);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetUserVerseByReference failed ({(int)response.StatusCode}): {payload}");
+            }
+            return await response.Content.ReadFromJsonAsync<UserVerse>();
+        }
+
+        public async Task<List<Verse>> GetUserVerseByKeywordsAsync(List<string> keywords)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/getuserversebykeywords", keywords);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetUserVerseByKeywords failed ({(int)response.StatusCode}): {payload}");
+            }
+            return await response.Content.ReadFromJsonAsync<List<Verse>>();
+        }
+        #endregion
     }
 }

@@ -108,14 +108,20 @@ namespace VerseApp.Pages.Authentication
                 progress = 37;
                 overlayMessage = "Checking usernames...";
                 await Task.Delay(1);
-                bool exists = await dataservice.GetAllUsernames(username.Trim());
+                int exists = await dataservice.GetAllUsernames(username.Trim());
                 progress = 78;
                 overlayMessage = "Checking if your username is available...";
                 await Task.Delay(1);
 
-                if (exists)
+                if (exists == 1)
                 {
                     message = "Username already exists.";
+                    overlayVisible = false;
+                    return;
+                }
+                else if (exists == 2)
+                {
+                    errorMessage = "There was an error connecting to the database. Please try again.";
                     overlayVisible = false;
                     return;
                 }

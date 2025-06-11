@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
 
+
+	<ItemGroup>
+		<EmbeddedResource Include="bible_structure.json" />
+	</ItemGroup>
+
+
 </Project>

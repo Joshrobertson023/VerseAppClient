@@ -91,14 +91,21 @@ namespace VerseApp.Pages.Authentication
                 message = "";
                 errorMessage = "";
 
-                bool exists = await dataservice.GetAllUsernames(username.Trim());
 
-                if (!exists)
+                int result = await dataservice.GetAllUsernames(username.Trim());
+
+                if (result == 0)
                 {
                     message = "Username does not exist.";
                     overlayVisible = false;
                     overlayMessage = "";
                     progress = 0;
+                    return;
+                }
+                else if (result == 2)
+                {
+                    errorMessage = "There was an error connecting to the database. Please try again.";
+                    overlayVisible = false;
                     return;
                 }
 

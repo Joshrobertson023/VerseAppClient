@@ -16,7 +16,7 @@ namespace VerseApp.Pages.MyStuff
         private int progress;
         private string overlayMessage { get; set; }
         private string errorMessage { get; set; }
-        private bool reorganizing;
+        private bool reorganizing = false;
 
         private bool overlayVisible = false;
 
@@ -39,7 +39,7 @@ namespace VerseApp.Pages.MyStuff
 
         private void AddCollection() // User gets max of 50 collections, with 100 verses max each
         {
-
+            nav.NavigateTo("/mystuff/newcollection");
         }
     }
 }

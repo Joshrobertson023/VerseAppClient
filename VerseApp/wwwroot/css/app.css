@@ -31,9 +31,13 @@
     box-shadow: none !important;
 }
 
-/*html, body, #app, .mud-main-content, .mud-layout, .single-stack {
+html, body, #app, .mud-main-content, .mud-layout, .single-stack {
     height: 100% !important;
-}*/
+}
+
+.single-stack {
+    margin-top: 200px !important;
+}
 
 .mud-main-content {
     margin: 0 !important;

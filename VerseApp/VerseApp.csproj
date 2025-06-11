@@ -16,12 +16,26 @@
     <PackageReference Include="MudBlazor" Version="8.7.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.11.0" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\DBAccessLibrary\DBAccessLibrary.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<None Include="..\DBAccessLibrary\bible_structure.json">
+			<Link>bible_structure.json</Link>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
+		</None>
+	</ItemGroup>
+
+<ItemGroup>
+  <None Include="..\DBAccessLibrary\bible_structure.json">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </None>
+</ItemGroup>
+
+
+	<ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>
 
