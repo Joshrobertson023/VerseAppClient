@@ -14,6 +14,13 @@ namespace DBAccessLibrary
         public UserModel currentUser;
         public List<RecoveryInfo> recoveryInfo;
 
+        public string[] Admins { get; } = new[]
+        {
+            "Joshrobertson023"
+        };
+
+        public string everyoneUsername = "jUW=f<9m!'2kgegw3g";
+
         public string[] booksOfBible { get; } =
         {
             "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy",

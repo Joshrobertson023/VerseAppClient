@@ -1,12 +1,12 @@
-.tab-bar {
+﻿.tab-bar {
     position: fixed;
     bottom: 0px;
     width: 100%;
 }
 
-.tab-bar .mud-tabs-indicator {
-    display: none;
-}
+    .tab-bar .mud-tabs-indicator {
+        display: none;
+    }
 
 .mud-icon-button-root.no-hover:hover {
     background-color: var(--mud-palette-dark) !important;
@@ -14,12 +14,11 @@
 }
 
 .no-hover {
-    background-color: var(--mud-palette-dark) !important;
     box-shadow: none !important;
 }
 
 .mud-appbar {
-    height: 100px !important;
+    height: 75px !important;
 }
 
 .mud-toolbar .mud-toolbar-gutters .mud-toolbar-appbar {
@@ -35,9 +34,6 @@ html, body, #app, .mud-main-content, .mud-layout, .single-stack {
     height: 100% !important;
 }
 
-.single-stack {
-    margin-top: 200px !important;
-}
 
 .mud-main-content {
     margin: 0 !important;
@@ -46,9 +42,101 @@ html, body, #app, .mud-main-content, .mud-layout, .single-stack {
 
 .single-stack {
     width: 100%;
+    margin-top: 65px;
     display: flex;
     justify-content: center;
+    padding-left: 5%;
+    padding-right: 5%;
+    padding-bottom: 160px;
+}
+
+.scroll-wrapper {
+    position: absolute;
+    top: 65px;
+    bottom: 50px;
+    overflow-y: auto;
+    width: 100%;
+    scrollbar-gutter: stable both-edges;
+}
+
+.inner-content {
+    width: 100%;
+    margin-top: -50px;
+    padding-top: 50px;
+}
+
+.collections {
+    height: auto !important;
+    margin-top: 25px !important;
+}
+
+.collection {
+    height: 100px !important;
+    min-height: 100px !important;
+    margin-top: 25px !important;
+    outline: 4px solid #585858;
+    padding-left: 10px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border-radius: 6px;
+    display: flex;
+}
+
+.edit-collection {
+    background-color: #252525;
+}
+
+.top-stack {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.appbar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1300; /* Do not change */
+    display: flex;
     align-items: center;
+    justify-content: flex-start;
+    padding-left: 10px;
+    width: 65%;
+    height: 80px;
+    background-color: var(--mud-palette-background);
+}
+
+.back-btn {
+    width: 25px !important;
+    margin: 0 !important;
+}
+
+.button .back-btn {
+    width: 0px !important;
+}
+
+#top-add {
+    width: 100%;
+    height: 50px !important;
+    display: flex;
+    justify-content: space-between;
+}
+
+.mud-appbar {
+    background: rgba(0, 0, 0, 0);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(15.2px);
+    -webkit-backdrop-filter: blur(15.2px);
+}
+
+.no-hover {
+    background-color: transparent !important;
+}
+
+.mud-tabs-tabbar-inner {
+    background-color: transparent !important;
 }
 
 .mud-overlay-content {
@@ -62,6 +150,8 @@ html, body, #app, .mud-main-content, .mud-layout, .single-stack {
 html, body, #app {
     width: 100%;
     height: 100%;
+    overflow-y: hidden;
+    overflow-x: hidden;
 }
 
 .phone-view {
@@ -93,6 +183,93 @@ html, body, #app {
     display: flex !important;
     align-items: center !important;
     justify-content: space-evenly !important;
+    padding: 10px !important;
+}
+
+.mud-tabs-tabbar {
+    background-color: transparent !important;
+    margin-left: -17px !important;
+    height: 65px !important;
+    box-shadow: none !important;
+}
+
+.mud-tabs-tabbar-inner, .mud-tabs-tabbar-content, .mud-tabs-tabbar-wrapper {
+    height: 100% !important;
+}
+
+.mud-tooltip-root .mud-tooltip-inline {
+    display: flex;
+    align-items: center;
+    width: 15% !important;
+}
+
+.mud-tab {
+    margin-top: 10px !important;
+}
+
+.mud-drawer .mud-drawer-temporary {
+    z-index: 9999999 !important;
+}
+
+.mud-drawer {
+    background-color: #252525 !important;
+}
+
+.mud-drawer-content {
+    padding: 25px !important;
+}
+
+.notifications-popover {
+    position: absolute;
+    z-index: 99999999;
+    width: 88% !important;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+}
+
+#icons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.mud-icon-button-label {
+
+}
+
+.search-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.mud-icon-size-extrasmall {
+    font-size: 1.25rem !important;
+    width: 1em !important;
+    height: 1em !important;
+}
+
+.mud-icon-size-small {
+    font-size: 1.5rem !important;
+    width: 1.25em !important;
+    height: 1.25em !important;
+}
+
+.mud-icon-size-medium {
+    font-size: 1.4rem !important;
+    width: 1.15em !important;
+    height: 1.15em !important;
+    font-weight: 200 !important;
+}
+
+.mud-icon-size-large {
+    font-size: 1.7rem !important;
+    width: 1.75em !important;
+    height: 1.75em !important;
+    margin-top: 7px;
 }
 
 .top-appbar .mud-toolbar-appbar {
@@ -100,6 +277,7 @@ html, body, #app {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    height: 70px !important;
 }
 
 .bottom-appbar .mud-toolbar-appbar {
@@ -112,6 +290,8 @@ html, body, #app {
 .icon-text {
     margin-top: -8px;
     z-index: 2;
+    font-weight: 200 !important;
+    font-size: 10px;
 }
 
 .button {
@@ -121,15 +301,10 @@ html, body, #app {
     justify-content: center;
 }
 
-.collection {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: space-between;
-    width: 100%;
-    height: 50px;
-    outline: 7px solid #C3C3C3;
-    border-radius: 7px;
+.back-btn {
+    width: 55px !important;
+    margin-left: 15px !important;
+    margin-right: 15px !important;
 }
 
 .mud-button {
@@ -159,9 +334,9 @@ html, body, #app {
     background-color: transparent !important;
 }
 
-.mud-button-text:hover .mud-button-label {
-    text-decoration: underline !important;
-}
+    .mud-button-text:hover .mud-button-label {
+        text-decoration: underline !important;
+    }
 
 .custom {
     margin-top: -15px;
@@ -179,7 +354,7 @@ html, body, #app {
 }
 
 #blazor-error-ui {
-    background: lightyellow;
+    background: transparent;
     bottom: 0;
     box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
     display: none;

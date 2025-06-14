@@ -44,9 +44,9 @@ builder.Services.AddMudServices(service =>
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
                 FontSize = "0.7rem",
-                FontWeight = "500",
-                LineHeight = "1",
-                LetterSpacing = ".01em"
+                FontWeight = "300",
+                LineHeight = "1.5",
+                LetterSpacing = ".02em"
             },
             H1 = new H1Typography
             {
@@ -59,7 +59,7 @@ builder.Services.AddMudServices(service =>
             H2 = new H2Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.75rem",
+                FontSize = "1.5rem",
                 FontWeight = "500",
                 LineHeight = "1.5",
                 LetterSpacing = ".01em"
@@ -67,18 +67,18 @@ builder.Services.AddMudServices(service =>
             H3 = new H3Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.5rem",
-                FontWeight = "400",
-                LineHeight = "1.4",
-                LetterSpacing = ".0075em"
+                FontSize = "0.8rem",
+                FontWeight = "500",
+                LineHeight = "1.7",
+                LetterSpacing = ".02em"
             },
             H4 = new H4Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.25rem",
-                FontWeight = "400",
-                LineHeight = "1.4",
-                LetterSpacing = ".0075em"
+                FontSize = "1.3rem",
+                FontWeight = "500",
+                LineHeight = "1.7",
+                LetterSpacing = ".02em"
             },
             H5 = new H5Typography
             {
@@ -91,10 +91,10 @@ builder.Services.AddMudServices(service =>
             H6 = new H6Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "3rem",
-                FontWeight = "200",
-                LineHeight = "1.6",
-                LetterSpacing = ".0075em"
+                FontSize = "1rem",
+                FontWeight = "400",
+                LineHeight = "0.8",
+                LetterSpacing = ".01em"
             },
             Subtitle1 = new Subtitle1Typography
             {

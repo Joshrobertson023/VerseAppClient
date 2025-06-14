@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using DBAccessLibrary.Models
+@inherits LayoutComponentBase
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject MudTheme AppTheme
 <MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" Theme="AppTheme" />
@@ -17,10 +18,16 @@
 
                     @if (firstOpen)
                     {
-                        <MudTabs Elevation="2" Rounded="true" ActivePanelIndexChanged="@(index => SetMyStuffPage(index))">
-                            <MudTabPanel Style="background-color: transparent !important; width: 25% !important;" Text="Collections"></MudTabPanel>
-                            <MudTabPanel Style="background-color: transparent !important; width: 25% !important;" Text="Plans"></MudTabPanel>
-                        </MudTabs>
+                        if (pageSelected == 0)
+                        {
+                            <MudButton OnClick="Collections_Click" Variant="Variant.Text" Style="text-decoration: underline; width: 25% !important;">Collections</MudButton>
+                            <MudButton OnClick="Plans_Click" Variant="Variant.Text" Style="width: 25% !important;">Plans</MudButton>
+                        }
+                        else
+                        {
+                            <MudButton OnClick="Collections_Click" Variant="Variant.Text" Style="width: 25% !important;">Collections</MudButton>
+                            <MudButton OnClick="Plans_Click" Variant="Variant.Text" Style="text-decoration: underline; width: 25% !important;">Plans</MudButton>
+                        }
                     }
                     else if (secondOpen)
                     {
@@ -38,19 +45,78 @@
                     {
                         <h3>PageTitle</h3>
                     }
-)
-                    <MudButton OnClick="@(() => ProfileDrawerToggle(Anchor.End))">
-                        @if (!string.IsNullOrEmpty(data.currentUser?.Username))
+
+
+                    <div style="display: flex; align-items: center;">
+                        @* -- Notifications -- *@
+                        <MudButton OnClick="ToggleNotificationsOpen">
+                            @if (data.currentUser.NotificationsUnseen.Count == 0)
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Notifications" Size="Size.Medium"></MudIcon>
+                            }
+                            else 
+                            {
+                                <MudBadge Content="@data.currentUser.Notifications.Count" Overlap="true" Color="Color.Error" Style="margin-top: 15px !important; margin-right: 5px !important;">
+                                    <MudIcon Icon="@Icons.Material.Filled.Notifications" Size="Size.Medium"></MudIcon>
+                                </MudBadge>
+                            }
+                        </MudButton>
+                         
+                        @* -- Profile button -- *@
+                        <MudButton OnClick="@(() => ProfileDrawerToggle(Anchor.End))"> 
+                            @if (!string.IsNullOrEmpty(data.currentUser?.Username))
+                            {
+                                <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
+                                    @data.currentUser.Username.ToUpper()[0]
+                                </MudAvatar>
+                            }
+                            else
+                            {
+                                <MudIcon Icon="@Icons.Material.Filled.Person" />
+                            }
+                        </MudButton>
+                    </div>
+
+                    <MudPopover Open="@notificationsOpen" Class="notifications-popover" Style="display: flex; flex-direction: column; align-items: flex-start; justify-content: start; overflow-y: auto; overflow-x:hidden; fixed !important; top: 100px !important; right: 24px !important; left: auto !important; padding: 24px !important;">
+                        @if (data.currentUser.Notifications.Count == 0)
                         {
-                            <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined">
-                                @data.currentUser.Username.ToUpper()[0]
-                            </MudAvatar>
+                            <h3>No Notifications</h3>
                         }
                         else
                         {
-                            <MudAvatar Color="Color.Tertiary" Variant="Variant.Outlined" Icon="@Icons.Material.Filled.Person" />
+                            foreach (var notification in data.currentUser.Notifications)
+                            {
+                                <div style="display: flex; width: 100%; align-items: center; justify-content: space-between; height: fit-content; margin-bottom: 10px;">
+                                    <div style="width: 5%; margin-left: -20px; margin-right: -5px;">
+                                        @if (notification.Seen == 0)
+                                        {
+                                            <div style="border-radius: 50px; width: 10px; height: 10px; background-color: #0F47D7;"></div>
+                                        }
+                                    </div>
+                                    <div style="width: 18%;">
+                                        @if (notification.SentBy != "VerseApp Team")
+                                        {
+                                            <MudAvatar Color="Color.Secondary">@notification.SentBy.ToUpper()[0]</MudAvatar>
+                                        }
+                                        else
+                                        {
+                                            <MudIcon Size="Size.Large" Icon="@Icons.Material.Filled.AdminPanelSettings"></MudIcon>
+                                        }
+                                    </div>
+                                    <div style="width: 75%; display: flex; flex-direction: column; align-items: flex-start; justify-content: center;">
+                                        <h3>@notification.Title</h3>
+                                        <p>@notification.Message</p>
+                                        <p style="font-size: 8px; font-weight: 100;">@DateTimeParser.GetNotificationSentTime(notification.DateCreated)</p>
+                                    </div>
+                                    <div style="width: 15%;">
+                                        <MudButton OnClick="() => DeleteNotification(notification)">
+                                            <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Close"></MudIcon>
+                                        </MudButton>
+                                    </div>
+                                </div>
+                            }
                         }
-                    </MudButton>
+                    </MudPopover>
 
                 </MudAppBar>
 )
@@ -62,7 +128,7 @@
                                                                display:flex;
                                                                align-items:center;
                                                                justify-content:space-evenly;">
-                <div class="d-flex flex-grow-1 no-hover" style="align-items: center; justify-content: space-between; width: 100%;">
+                <div id="icons">
                     @if (firstOpen)
                     {
                         <div class="icon-div">
@@ -80,18 +146,18 @@
                     @if (secondOpen)
                     {
                         <div class="icon-div">
-                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircle" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
+                                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Lightbulb" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
                             <p class="icon-text">Practice</p>
                         </div>
                     }
                     else
                     {
                         <div class="icon-div">
-                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.AddCircleOutline" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
+                                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Lightbulb" Color="Color.Inherit" OnClick="@((e) => Practice_Click())" />
                             <p class="icon-text">Practice</p>
                         </div>
                     }
-                    <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Search_Click())" />
+                    <MudIconButton Class="no-hover search-icon" Icon="@Icons.Material.Filled.Search" Size="Size.Large" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Search_Click())" />
                     @if (thirdOpen)
                     {
                         <div class="icon-div">
@@ -109,14 +175,14 @@
                     @if (fourthOpen)
                     {
                         <div class="icon-div">
-                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Person" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
+                                <MudIconButton Class="no-hover" Icon="@Icons.Material.Filled.Explore" Ripple="false" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
                             <p class="icon-text">Community</p>
                         </div>
                     }
                     else
                     {
                         <div class="icon-div">
-                            <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Person" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
+                                <MudIconButton Class="no-hover" Icon="@Icons.Material.Outlined.Explore" Color="Color.Inherit" OnClick="@((e) => Community_Click())" />
                             <p class="icon-text">Community</p>
                         </div>
                     }
@@ -127,6 +193,12 @@
 
 
             <MudDrawer @bind-Open="@profileDrawerOpen" Style="padding: 15px;" Anchor="Anchor.End">
+                @if(data.Admins.Contains(data.currentUser.Username))
+                {
+                    <div class="button">
+                        <MudButton OnClick="Admin_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Admin Portal</MudButton>
+                    </div>
+                }
                 <div class="button">
                     <MudButton OnClick="Signout_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Sign out</MudButton>
                 </div>
@@ -150,6 +222,34 @@
     [Inject]
     Data data { get; set; }
     private int activeIndex = 0;
+    private int numNotifications { get; set; } = 0;
+    private bool notificationsOpen = false;
+
+    private void Admin_Click()
+    {
+        nav.NavigateTo("/adminportal");
+    }
+
+    private async Task ToggleNotificationsOpen()
+    {
+        notificationsOpen = !notificationsOpen;
+
+        if (notificationsOpen)
+            return;
+
+        if (data.currentUser.Notifications.Count > 0)
+        {
+            foreach (var notification in data.currentUser.Notifications)
+            {
+                if (notification.Seen == 0)
+                {
+                    notification.Seen = 1;
+                    await dataservice.MarkNotificationAsRead(notification.Id);
+                    data.currentUser.NotificationsUnseen.RemoveAll(n => n.Id == notification.Id);
+                }
+            }
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -165,6 +265,8 @@
         try
         {
             data.currentUser = await dataservice.LoginUserWithTokenAsync(token);
+            data.currentUser.Notifications = await dataservice.GetUserNotifications(data.currentUser.Username);
+            _ = PollNotificationsAsync();
             if (data.currentUser == null)
             {
                 Console.WriteLine("currentUser is null.");
@@ -184,12 +286,28 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+
+        _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
+        StateHasChanged();
+    }
+
+    private async Task PollNotificationsAsync()
+    {
+        while (true)
         {
-            _isDarkMode = await _mudThemeProvider.GetSystemDarkModeAsync();
-            StateHasChanged();
+            if (!string.IsNullOrEmpty(data.currentUser.Username))
+            {
+                data.currentUser.Notifications = await dataservice.GetUserNotifications(data.currentUser.Username);
+                Console.WriteLine("Requested user notifications.");
+                await InvokeAsync(StateHasChanged);
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(30));
         }
     }
+
+
 
     bool profileDrawerOpen = false;
     private Anchor anchor;
@@ -258,16 +376,30 @@
         nav.NavigateTo("/authentication/login");
     }
 
-    private void SetMyStuffPage(int index)
+    private int pageSelected = 0;
+    private void Collections_Click()
     {
-        activeIndex = index;
-        if (index == 0)
+        nav.NavigateTo("/");
+        pageSelected = 0;
+    }
+
+    private void Plans_Click()
+    {
+        nav.NavigateTo("/mystuff/plans");
+        pageSelected = 1;
+    }
+
+    private async Task DeleteNotification(Notification notification)
+    {
+        try
         {
-            nav.NavigateTo("/");
+            await dataservice.DeleteNotification(notification.Id);
+            data.currentUser.Notifications.Remove(notification);
+            StateHasChanged();
         }
-        else if (index == 1)
+        catch (Exception ex)
         {
-            nav.NavigateTo("/mystuff/plans");
+            Console.WriteLine($"Error deleting notification: {ex.Message}");
         }
     }
 }

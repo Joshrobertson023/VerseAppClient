@@ -1,0 +1,63 @@
+﻿@page "/adminportal"
+@namespace VerseApp.Pages
+
+@* <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay> *@
+
+
+<div class="single-stack" style="flex-direction: column; justify-content: flex-start;">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div>
+            <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+            <p style="margin-left: 5px;">@errorMessage</p>
+        </div>
+    }
+
+    <div class="appbar-overlay">
+        <h2 style="text-align: center;">Admin Portal</h2>
+    </div>
+
+
+    @if (data.Admins.Contains(data.currentUser.Username))
+    {
+        <div style="display: flex; flex-direction: column;">
+            <h3>Send a notification to all users</h3>
+            <MudTextField @bind-Value="notificationTitle" MaxLength="20" Label="Title" Variant="Variant.Outlined"></MudTextField>
+            <MudTextField @bind-Value="notificationBody" MaxLength="100" Lines="2" Label="Body" Variant="Variant.Outlined"></MudTextField>
+            <p>Use &lt;username&gt; where you want to insert everyone's individual username. For email notifications, the person's full name is used. (still use &lt;username&gt;)</p>
+            <MudRadioGroup @bind-Value="notificationType">
+                <MudRadio Value="@("App Notification")" Color="Color.Secondary">App Notification</MudRadio>
+                <MudRadio Value="@("Email Notification")" Color="Color.Secondary">Email Notification</MudRadio>
+            </MudRadioGroup>
+            <MudButton Variant="Variant.Outlined" Color="Color.Secondary" OnClick="SendGlobalNotification">Send Notification</MudButton>
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <p>@message</p>
+            }
+        </div>
+        <h3>Search Users</h3>
+        // For each user you can send a notification, ban, delete, etc.
+        <h3>Reports</h3>
+        // If my username, add ability to add, remove admins
+    }
+    else
+    {
+        <h3 style="text-align: center; margin-bottom: 10%;">You do not have permission to access this page.</h3>
+    }
+</div>

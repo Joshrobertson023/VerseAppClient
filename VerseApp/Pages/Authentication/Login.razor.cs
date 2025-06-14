@@ -1,6 +1,7 @@
-﻿using DBAccessLibrary.Models;
-using DBAccessLibrary;
+﻿using DBAccessLibrary;
+using DBAccessLibrary.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 
 namespace VerseApp.Pages.Authentication
@@ -92,7 +93,7 @@ namespace VerseApp.Pages.Authentication
                 errorMessage = "";
 
 
-                int result = await dataservice.GetAllUsernames(username.Trim());
+                int result = await dataservice.CheckIfUsernameExists(username.Trim());
 
                 if (result == 0)
                 {
@@ -162,6 +163,14 @@ namespace VerseApp.Pages.Authentication
         private void CreateAnAccount_Click()
         {
             nav.NavigateTo("/authentication/createaccount");
+        }
+
+        private async Task CheckForEnterKey(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                await Signin_Click();
+            }
         }
 
         private void ForgotPassword_Click()

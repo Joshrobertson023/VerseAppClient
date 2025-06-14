@@ -9,6 +9,8 @@ namespace DBAccessLibrary.Models
     public class UserModel
     {
         public List<Collection> Collections { get; set; } = new List<Collection>();
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
+        public List<Notification> NotificationsUnseen { get; set; } = new List<Notification>();
         public int Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }

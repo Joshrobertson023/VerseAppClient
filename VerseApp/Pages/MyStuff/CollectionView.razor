@@ -1,0 +1,90 @@
+﻿@page "/mystuff/collection/{_collectionId}"
+@namespace VerseApp.Pages.MyStuff
+
+<MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
+    <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
+        <ChildContent>
+            <MudStack Spacing="0" AlignItems="AlignItems.Center" Justify="Justify.Center">
+                <MudText Typo="Typo.subtitle2">@progress %</MudText>
+            </MudStack>
+        </ChildContent>
+    </MudProgressCircular>
+    @if (!string.IsNullOrEmpty(overlayMessage))
+    {
+        <h2>@overlayMessage</h2>
+    }
+    else
+    {
+        <h2 style="margin-left: 5px;">Loading...</h2>
+    }
+</MudOverlay>
+
+
+<div class="single-stack" style="flex-direction: column; justify-content: flex-start;">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div>
+            <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+            <p style="margin-left: 5px;">@errorMessage</p>
+        </div>
+    }
+    <div class="appbar-overlay">
+        <div class="button back-btn">
+            <MudButton Variant="Variant.Text" Size="Size.Small" IconSize="Size.Medium" StartIcon="@Icons.Material.Filled.ArrowBack" OnClick="Back_Click"></MudButton>
+        </div>
+        @if (currentCollection != null)
+        {
+            <h2 style="text-align: center;">@currentCollection.Title</h2>
+        }
+    </div>
+    @if (currentCollection == null)
+    {
+        <div style="margin-bottom: 40px;"></div>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+    }
+    else
+    {
+        @if (reorganizing) // Get dropzone code later
+        {
+            <div id="top-add" style="width: 100%;">
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton>
+            </div>
+        }
+        else
+        {
+            <div id="top-add" style="width: 100%;">
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
+                <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
+            </div>
+        }
+
+        @if (currentCollection.Author != data.currentUser.Username && currentCollection.Visibility == 0)
+        {
+            <h3 style="text-align: center; margin-bottom: 10%;">You do not have permission to access this page.</h3>
+        }
+        else
+        {
+            <div class="single-stack">
+                @foreach (var userVerse in currentCollection.UserVerses)
+                {
+                    <div onclick="@(() => Expand(userVerse))">
+                        <h3>@userVerse.Reference</h3>
+                        @foreach (var verse in userVerse.Verses)
+                        {
+                            <p>@verse.Text</p>
+                        }
+                    </div>
+                    <MudCollapse Expanded="@userVerse.Expanded">
+                        <div>
+                            <p>Memorized: @userVerse.ProgressPercent</p>
+                        </div>
+                    </MudCollapse>
+                }
+            </div>
+        }
+
+}
+</div>

@@ -51,7 +51,7 @@ namespace VerseApp.Pages.MyStuff
             await JSRuntime.InvokeVoidAsync("history.back");
         }
 
-        private string collectionName { get; set; }
+        private string collectionName { get; set; } = "Uncategorized";
         private List<UserVerse> collectionVerses { get; set; } = new();
         private UserVerse drawerVerse { get; set; }
         private string readableReference { get; set; }
@@ -65,6 +65,9 @@ namespace VerseApp.Pages.MyStuff
         private int numChapters;
         private int numVerses;
         private string drawerMessage;
+        private bool showAddPassage = true;
+        private bool addedPassage = false;
+        private int visibility = 2; // 0 = private, 1 = friends, 2 = public
 
         private string book
         {
@@ -102,7 +105,6 @@ namespace VerseApp.Pages.MyStuff
 
         private void OnBookChange()
         {
-            chapter = 0;
             Verses = Array.Empty<int>();
             selectedVerses = Array.Empty<int>();
 
@@ -131,9 +133,11 @@ namespace VerseApp.Pages.MyStuff
 
             try
             {
+                showAddPassage = true;
                 overflow = false;
                 search = string.Empty;
                 drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = book, Chapter = chapter, Verses = selectedVerses.ToList() });
+                addedPassage = false;
             }
             catch (Exception ex)
             {
@@ -153,6 +157,7 @@ namespace VerseApp.Pages.MyStuff
             //try
             //{
             string search = userSearch.Trim();
+            string reference = string.Empty;
             search += " "; // Terminate with special character
                            // Check for proper format: book chapter verses
                            // if first word is not a book name, then search by keyword(s)
@@ -186,6 +191,7 @@ namespace VerseApp.Pages.MyStuff
                             if (firstWord == searchTerm)
                             {
                                 firstWord = book.Key;
+                                reference += book.Key + " ";
                                 found = true;
                             }
                         }
@@ -196,7 +202,8 @@ namespace VerseApp.Pages.MyStuff
             if (found)
             {
                 // Search by reference
-                drawerMessage = "Searching by reference: " + search;
+                drawerMessage = "Showing results for:" + search;
+                showAddPassage = true;
                 string _book = firstWord;
                 int _chapter = 0;
                 string chapterString = string.Empty;
@@ -220,6 +227,7 @@ namespace VerseApp.Pages.MyStuff
                     }
                 }
                 _chapter = int.TryParse(chapterString, out int chapterResult) ? chapterResult : throw new Exception("Error getting chapter.");
+                reference += _chapter.ToString() + ":";
                 Console.WriteLine($"Book: {_book}, Chapter: {_chapter}");
 
                 List<int> _verses = new List<int>();
@@ -229,6 +237,12 @@ namespace VerseApp.Pages.MyStuff
 
                 // Get the verses
                 i++;
+                // Get the readable reference
+                for (int r = i+1; r < search.Length; r++)
+                {
+                    reference += search[r];
+                }
+
                 verseRange = ",";
                 for (; i < search.Length; i++)
                 {
@@ -332,7 +346,7 @@ namespace VerseApp.Pages.MyStuff
                 }
 
                 Console.WriteLine($"Book: {_book}, Chapter: {_chapter}, Verses: {string.Join(", ", _verses)}");
-                drawerMessage = "Searching by reference: " + userSearch;
+                drawerMessage = "Showing results for " + userSearch;
                 try
                 {
                     Console.WriteLine("_verses.Count: " + _verses.Count);
@@ -350,6 +364,12 @@ namespace VerseApp.Pages.MyStuff
                     Console.WriteLine("_verses: " + string.Join(", ", _verses));
                     _verses.Sort();
                     drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = _book, Chapter = _chapter, Verses = _verses });
+                    drawerVerse.Reference = reference;
+                    foreach (var verse in drawerVerse.Verses)
+                    {
+                        Console.WriteLine("VerseId: " + verse.Id + ", Text: " + verse.Text);
+                    }
+                    addedPassage = false;
                 }
                 catch (Exception ex)
                 {
@@ -368,7 +388,8 @@ namespace VerseApp.Pages.MyStuff
             else
             {
                 // Search by keywords / exact phrase
-                drawerMessage = "Searching by keywords: " + search;
+                drawerMessage = "Showing results for " + search;
+                showAddPassage = false;
 
                 List<string> keywords = new List<string>();
 
@@ -413,14 +434,90 @@ namespace VerseApp.Pages.MyStuff
             }
         }
 
-        private void AddPassage_Click()
+        private void PassageToggle_Click(Verse verse)
         {
+            if (collectionVerses.Count >= 100)
+            {
+                errorMessage = "You can only add up to 100 verses in a collection.";
+                return;
+            }
+            UserVerse newUserVerse = new UserVerse
+            {
+                Reference = verse.Reference,
+                Verses = new List<Verse> { verse }
+            };
+            var existing = collectionVerses.FirstOrDefault(uv => uv.Reference == verse.Reference);
 
+            if (existing != null)
+            {
+                collectionVerses.Remove(existing);
+                return;
+            }
+
+            collectionVerses.Add(newUserVerse);
         }
 
-        private void CreateCollection_Click() // User gets max of 50 collections, with 100 verses max each
+        private void AddPassageFromReference_Click()
         {
+            if (drawerVerse == null || drawerVerse.Verses == null || drawerVerse.Verses.Count == 0)
+            {
+                errorMessage = "No verses to add.";
+                return;
+            }
+            if (collectionVerses.Count >= 100)
+            {
+                errorMessage = "You can only add up to 100 verses in a collection.";
+                return;
+            }
+            collectionVerses.Add(drawerVerse);
+            addedPassage = true;
+        }
 
+        private void DeleteFromCollection(UserVerse userVerse)
+        {
+            collectionVerses.Remove(userVerse);
+        }
+
+        private async Task CreateCollection_Click() // User gets max of 50 collections, with 100 verses max each
+        {
+            if (string.IsNullOrEmpty(collectionName))
+                return;
+
+            try
+            {
+                Collection newCollection = new Collection();
+                newCollection.Title = collectionName.Trim();
+                newCollection.UserVerses = collectionVerses;
+                newCollection.Author = data.currentUser.Username;
+                newCollection.NumVerses = collectionVerses.Count;
+                newCollection.Visibility = visibility;
+
+                overlayVisible = true;
+                await dataservice.AddNewCollection(newCollection);
+                foreach (var uv in collectionVerses)
+                {
+                    uv.UserId = data.currentUser.Id;
+                }
+                await dataservice.AddUserVersesToNewCollection(collectionVerses);
+                overlayVisible = false;
+                nav.NavigateTo("/");
+            }
+            catch (Exception ex)
+            {
+
+                errorMessage = ex.Message;
+                if (errorMessage.ToLower().Contains("timed out"))
+                {
+                    errorMessage = "Connection timed out.";
+                    overlayMessage = $"We had trouble connecting.\nRetrying...";
+                    await CreateCollection_Click();
+                }
+                else
+                {
+                    errorMessage = "We encountered an error. Please try again. " + ex.Message;
+                    overlayVisible = false;
+                }
+            }
         }
     }
 }

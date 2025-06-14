@@ -1,8 +1,9 @@
-﻿using DBAccessLibrary.Models;
-using DBAccessLibrary;
+﻿using DBAccessLibrary;
+using DBAccessLibrary.Models;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using MudBlazor;
 
 namespace VerseApp.Pages.Authentication
 {
@@ -84,6 +85,14 @@ namespace VerseApp.Pages.Authentication
         private void CloseDrawer()
         {
 
+        }
+
+        private async Task CheckForEnterKey(KeyboardEventArgs e)
+        {
+            if (e.Key == "Enter")
+            {
+                await CreateAccount2_Click();
+            }
         }
 
         private void Back2_Click()

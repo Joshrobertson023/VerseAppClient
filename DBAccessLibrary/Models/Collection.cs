@@ -15,6 +15,6 @@ namespace DBAccessLibrary.Models
         public int Visibility { get; set; }
         public int IsPublished { get; set; }
         public int NumSaves { get; set; }
-        public List<UserVerse> verses { get; set; } = new List<UserVerse>();
+        public List<UserVerse> UserVerses { get; set; } = new List<UserVerse>();
     }
 }

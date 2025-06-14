@@ -1,11 +1,12 @@
 ﻿using DBAccessLibrary;
 using DBAccessLibrary.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace VerseApp.Pages.MyStuff
 {
-    public partial class Collections : ComponentBase
+    public partial class CollectionView : ComponentBase
     {
         [Inject]
         NavigationManager nav { get; set; }
@@ -15,6 +16,8 @@ namespace VerseApp.Pages.MyStuff
         Data data { get; set; }
         [Inject]
         private IDialogService dialogService { get; set; }
+        [Inject]
+        IJSRuntime JSRuntime { get; set; }
         public bool addingVerse { get; set; }
         private bool loading { get; set; }
         private int progress;
@@ -22,6 +25,9 @@ namespace VerseApp.Pages.MyStuff
         private string errorMessage { get; set; }
         private bool reorganizing = false;
         private bool overlayVisible = false;
+        [Parameter]
+        public string _collectionId { get; set; } = string.Empty;
+        Collection currentCollection { get; set; }
 
         private void ToggleOverlay()
         {
@@ -29,38 +35,41 @@ namespace VerseApp.Pages.MyStuff
             StateHasChanged();
         }
 
-        private void OpenCollection(Collection collection)
+
+        protected override async Task OnInitializedAsync()
         {
-            if (collection != null)
+            try
             {
-                nav.NavigateTo($"/mystuff/collection/{collection.Id}");
+                int collectionId = Convert.ToInt32(_collectionId);
+
+                Collection existingCollection = data.currentUser.Collections.FirstOrDefault(c => c.Id == collectionId);
+
+                if (existingCollection != null)
+                {
+                    currentCollection = existingCollection;
+                }
+                else
+                {
+                    currentCollection = await dataservice.GetCollectionAsync(collectionId);
+                    if (currentCollection != null)
+                    data.currentUser.Collections.Add(currentCollection);
+                }
+            }
+            catch (Exception ex)
+            {
+                errorMessage = $"Error loading collection: {ex.Message}";
             }
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private void Expand(UserVerse userVerse)
         {
-            if (firstRender)
-            {
-                while (string.IsNullOrEmpty(data.currentUser.Username) && DateTime.Now < DateTime.Now.AddSeconds(1))
-                {
-                    await Task.Delay(200);
-                }
-
-                if (!string.IsNullOrEmpty(data.currentUser.Username))
-                {
-                    List<Collection> collections = await dataservice.GetUserCollections(data.currentUser.Username);
-                    foreach (var collection in collections)
-                    {
-                        if (!data.currentUser.Collections.Any(c => c.Id == collection.Id))
-                        {
-                            data.currentUser.Collections.Add(collection);
-                        }
-                    }
-                    StateHasChanged();
-                }
-            }
+            userVerse.Expanded = !userVerse.Expanded;
         }
 
+        private async Task Back_Click()
+        {
+            await JSRuntime.InvokeVoidAsync("history.back");
+        }
 
         private void CloseDrawer()
         {

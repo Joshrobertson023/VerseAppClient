@@ -13,5 +13,7 @@ namespace DBAccessLibrary.Models
         public string Text { get; set; }
         public int UsersSaved { get; set; }
         public int UsersMemorized { get; set; }
+        public int InYourLists { get; set; }
+        public int YouMemorized { get; set; }
     }
 }

@@ -61,38 +61,45 @@ namespace DBAccessLibrary
             }
         }
 
-        public async Task<int> GetAllUsernames(string username)
+        public async Task<int> CheckIfUsernameExists(string username)
         {
-            int result = 0;
-            bool _result = false;
-
+            var response = await http.PostAsJsonAsync($"api/user/checkifusernameexists", username);
+            if (!response.IsSuccessStatusCode)
+            {
+                var raw = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"CheckIfUsernameExists failed ({(int)response.StatusCode}): {raw}");
+                return -1;
+            }
             try
             {
-                var response = await http.PostAsJsonAsync("api/user/usernames", username);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var rawError = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"CheckForUsername failed ({(int)response.StatusCode}): {rawError}");
-                    return 2;
-                }
-
-                try
-                {
-                    _result = await response.Content.ReadFromJsonAsync<bool>();
-                    return _result == true ? 1 : 0;
-                }
-                catch (Exception jsonEx)
-                {
-                    var rawBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"Failed to parse JSON in CheckForUsername: {jsonEx.Message}\nBody was:\n{rawBody}");
-                    return 2;
-                }
+                return await response.Content.ReadFromJsonAsync<int>();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Exception in CheckForUsername: {ex.Message}");
-                return 2;
+                var raw = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Failed to parse JSON in CheckIfUsernameExists: {ex.Message}\nBody was:\n{raw}");
+                return -1;
+            }
+        }
+
+        public async Task<List<string>> GetAllUsernamesAsync()
+        {
+            var response = await http.GetAsync("api/user/getallusernames");
+            if (!response.IsSuccessStatusCode)
+            {
+                var raw = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"GetAllUsernames failed ({(int)response.StatusCode}): {raw}");
+                return null;
+            }
+            try
+            {
+                return await response.Content.ReadFromJsonAsync<List<string>>();
+            }
+            catch (Exception ex)
+            {
+                var raw = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Failed to parse JSON in GetAllUsernames: {ex.Message}\nBody was:\n{raw}");
+                return null;
             }
         }
 
@@ -247,6 +254,123 @@ namespace DBAccessLibrary
                 throw new Exception($"API GetUserVerseByKeywords failed ({(int)response.StatusCode}): {payload}");
             }
             return await response.Content.ReadFromJsonAsync<List<Verse>>();
+        }
+
+        public async Task AddNewCollection(Collection collection)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/addnewcollection", collection);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API AddNewCollection failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task<List<Collection>> GetUserCollections(string username)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/getusercollections", username);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetUserCollections failed ({(int)response.StatusCode}): {payload}");
+            }
+            return await response.Content.ReadFromJsonAsync<List<Collection>>();
+        }
+
+        public async Task DeleteCollectionAsync(int collectionId)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/deletecollection", collectionId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API DeleteCollection failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task<List<Notification>> GetUserNotifications(string username)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/getusernotifications", username);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetUserNotifications failed ({(int)response.StatusCode}): {payload}");
+            }
+
+            List<Notification> unseenNotifications = new List<Notification>();
+            List<Notification> notifications = new List<Notification>();
+
+            notifications = await response.Content.ReadFromJsonAsync<List<Notification>>();
+
+            foreach (var notification in notifications)
+            {
+                if (notification.Seen == 0)
+                    unseenNotifications.Add(notification);
+            }
+
+            data.currentUser.NotificationsUnseen = unseenNotifications;
+
+            return notifications;
+        }
+
+        public async Task MarkNotificationAsRead(int notificationId)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/marknotificationasread", notificationId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API MarkNotificationAsRead failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task DeleteNotification(int notificationId)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/deletenotification", notificationId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API DeleteNotification failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task SendNotification(Notification notification)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/sendnotification", notification);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API SendNotification failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task SendEmailNotification(Notification notification)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/sendemailnotification", notification);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API SendEmailNotification failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task<Collection> GetCollectionAsync(int collectionId)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/getcollection", collectionId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetCollection failed ({(int)response.StatusCode}): {payload}");
+            }
+            return await response.Content.ReadFromJsonAsync<Collection>();
+        }
+
+        public async Task AddUserVersesToNewCollection(List<UserVerse> userVerses)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/adduserversestonewcollection", userVerses);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API AddUserVerses failed ({(int)response.StatusCode}): {payload}");
+            }
         }
         #endregion
     }

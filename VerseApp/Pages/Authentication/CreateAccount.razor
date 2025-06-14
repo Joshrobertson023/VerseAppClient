@@ -44,14 +44,14 @@
         </div>
         <div class="button" style="margin-bottom: -5px;">
                 <MudTextField @bind-Value="email" Label="Enter your email address" MaxLength="50" Variant="Variant.Outlined"></MudTextField>
-            </div>
+            </div> 
             <div class="button">
                 <MudButton OnClick="DataPrivacy_Click" Variant="Variant.Text" FullWidth="true" Color="Color.Secondary" Style="text-decoration: underline;" Size="Size.Small" Class="ml-auto">Data Privacy</MudButton>
-            </div>
-        @if (!string.IsNullOrEmpty(message))
+            </div> 
+        @if (!string.IsNullOrEmpty(message)) 
         {
             <div>
-                <p>@message</p>
+                <p>@message </p>
             </div>
         }
         <div class="button">

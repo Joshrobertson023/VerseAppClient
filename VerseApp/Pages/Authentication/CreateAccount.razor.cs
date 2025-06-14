@@ -108,7 +108,7 @@ namespace VerseApp.Pages.Authentication
                 progress = 37;
                 overlayMessage = "Checking usernames...";
                 await Task.Delay(1);
-                int exists = await dataservice.GetAllUsernames(username.Trim());
+                int exists = await dataservice.CheckIfUsernameExists(username.Trim());
                 progress = 78;
                 overlayMessage = "Checking if your username is available...";
                 await Task.Delay(1);

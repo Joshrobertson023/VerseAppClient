@@ -20,5 +20,6 @@ namespace DBAccessLibrary.Models
         public int TimesMemorized { get; set; }
         public int Visibility { get; set; }
         public List<Verse> Verses { get; set; } = new List<Verse>();
+        public bool Expanded { get; set; } = true;
     }
 }

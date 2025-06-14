@@ -42,7 +42,7 @@
             <MudTextField @bind-Value="username" Label="Username" Variant="Variant.Outlined"></MudTextField>
         </div>
         <div class="button custom">
-            <MudTextField @bind-Value="password" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
+            <MudTextField @bind-Value="password" OnKeyUp="CheckForEnterKey" Label="Password" Variant="Variant.Outlined" InputType="@PasswordInput" Adornment="Adornment.End" AdornmentIcon="@PasswordInputIcon" OnAdornmentClick="ButtonTestclick" AdornmentAriaLabel="Show Password" />
         </div>
         @if (!string.IsNullOrEmpty(message))
         {

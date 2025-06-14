@@ -20,64 +20,88 @@
 </MudOverlay>
 
 
-<div class="single-stack">
-    <MudStack Style="width: 70%; height: 100%;">
-        @if (!string.IsNullOrEmpty(errorMessage))
+<div class="single-stack" style="flex-direction: column; justify-content: flex-start; overflow-y: auto;">
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div>
+            <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
+            <p style="margin-left: 5px;">@errorMessage</p>
+        </div>
+    }
+    @if (data.currentUser.Username == null || data.currentUser.Collections.Count == 0)
+    {
+        <div style="margin-bottom: 40px;"></div>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;"/>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;"/>
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+    }
+    else
+    {
+        @if (reorganizing) // Get dropzone code later
         {
-            <div style="margin-top: -36px; display: flex; align-items: center; justify-content: center; flex-direction: row;">
-                <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
-                <p style="margin-left: 5px;">@errorMessage</p>
+            <div id="top-add" style="width: 100%;">
+                <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton> 
             </div>
-        }
-        @if (data.currentUser == null)
-        {
-            <h3 style="text-align: center; margin-bottom: 10%;">Please sign in to your account</h3>
-
         }
         else
         {
-            @if (reorganizing) // Get dropzone code later
-            {
-                <div id="top-add" style="display: flex; align-items: center; justify-content: space-between;">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton> 
-                </div>
-            }
-            else
-            {
-                <div id="top-add" style="display: flex; align-items: center; justify-content: space-between;">
-                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Reorder</MudButton>
-                    <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Large" Color="Color.Secondary" /></MudButton>
-                </div>
-            }
-            @* <div id="collections">
-                @foreach (var collection in data.currentUser.Collections)
-                {
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="@($"/mystuff/collections/{collection.Id}")" Class="collection">
-                        <div style="display: flex; flex-direction: column; width: 50%;">
-                            <h2>@collection.Title</h2>
-                            <p>@collection.NumVerses</p>
-                            <p>@collection.Visibility</p>
-                        </div>
-                        <div style="display: flex; flex-direction: column; width: 50%;">
-                            <MudButton Variant="Variant.Text" OnClick="@ToggleSettingsOpen">
-                                <MudIcon Icon="@Icons.Material.Filled.Edit" Title="Edit Collection" Size="Size.Small" Color="Color.Secondary" />
-                            </MudButton>
-                            <MudPopover Open="@open" Fixed="true" Class="px-4 pt-4">
-                                <div style="display: flex; position: absolute; flex-direction: column;">
-                                    <MudButton OnClick="@ToggleSettingsOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Close</MudButton>
-                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Share</MudButton>
-                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Publish</MudButton>
-                                    <MudButton Class="ml-auto mr-n3 mb-1" Variant="Variant.Text" Color="Color.Secondary">Delete</MudButton>
-                                </div>
-                            </MudPopover>
-                            @if (collection.Author != data.currentUser.Username)
-                            {
-                                <p>@collection.Author</p>
-                            }
-                        </div>
-                    </MudButton>
-                }
-            </div> *@
+            <div id="top-add" style="width: 100%;">
+                <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
+                <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
+            </div>
         }
-    </MudStack>
+        @foreach (var collection in data.currentUser.Collections)
+        {
+            <div class="collection">
+                <a onclick="@(() => OpenCollection(collection))" style="display: flex; cursor: pointer; flex-direction: column; height: 100%; width: 80%; justify-content: space-between;">
+                    <div style="display: flex; flex-direction: column;">
+                        <h2>@collection.Title</h2>
+                        @if (collection.NumVerses == 1)
+                        {
+                            <p>@(collection.NumVerses + " Passage")</p>
+                        }
+                        else
+                        {
+                            <p>@(collection.NumVerses + " Passages")</p> 
+                        }
+                    </div>
+                    @if (collection.IsPublished == 0)
+                    {
+                        @if (collection.Visibility == 0)
+                        {
+                            <p>Private</p>
+                        }
+                        @if (collection.Visibility == 1)
+                        {
+                            <p>Visible to Friends</p>
+                        }
+                        @if (collection.Visibility == 2)
+                        {
+                            <p>Public</p>
+                        }
+                    }
+                    @if (collection.IsPublished == 1)
+                    {
+                        <p>Published</p>
+                    }
+                </a>
+                <div style="display: flex; flex-direction: column; justify-content: space-between;">
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Medium" Color="Color.Secondary" Style="margin-top: -10px !important; margin-right: -10px !important;">
+                        <div>
+                            <MudMenuItem OnClick="() => EditCollection(collection)">Edit</MudMenuItem>
+                            <MudMenuItem OnClick="() => ShareCollection(collection)">Share</MudMenuItem>
+                            <MudMenuItem OnClick="() => PublishCollection(collection)">Publish</MudMenuItem>
+                            <MudMenuItem OnClick="() => DeleteCollection(collection)">Delete</MudMenuItem>
+                        </div>
+                    </MudMenu>
+                    <p style="margin-right: 10px !important;">@("@" + collection.Author)</p> 
+                    @* @if (collection.Author != data.currentUser.Username)
+                    {
+                        <p>@collection.Author</p>
+                    } *@
+                </div>
+            </div>
+        }
+    }
 </div>
