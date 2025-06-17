@@ -50,14 +50,25 @@ html, body, #app, .mud-main-content, .mud-layout, .single-stack {
     padding-bottom: 160px;
 }
 
-.scroll-wrapper {
-    position: absolute;
-    top: 65px;
-    bottom: 50px;
-    overflow-y: auto;
-    width: 100%;
-    scrollbar-gutter: stable both-edges;
+/* put this at the end of your site.css (or in a CSS file loaded last) */
+
+/* hide for IE, Edge */
+.hide-scrollbar {
+    -ms-overflow-style: none !important; /* IE and Edge */
+    scrollbar-width: none !important; /* Firefox */
 }
+
+    /* hide for Chrome, Safari and Opera */
+    .hide-scrollbar::-webkit-scrollbar {
+        display: none !important;
+    }
+
+.scroll-to-top {
+    z-index: 999999 !important;
+    top: 65px !important;
+    right: 10px !important;
+}
+
 
 .inner-content {
     width: 100%;

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using MudBlazor;
+using System.Collections;
 
 namespace VerseApp.Pages.Authentication
 {
@@ -132,13 +133,13 @@ namespace VerseApp.Pages.Authentication
                     Guid guid = Guid.NewGuid();
                 string token = guid.ToString();
                 progress = 34;
-                overlayMessage = "Hashing your password...";
+                overlayMessage = "Securing your password...";
                 StateHasChanged();
                 await Task.Delay(200);
                 string hashedPassword = PasswordHash.CreateHash(password.Trim());
 
-                progress = 87;
-                overlayMessage = "Pushing account to database...";
+                progress = 66;
+                overlayMessage = "Pushing account to the server...";
                 StateHasChanged();
                 await Task.Delay(200);
                 await dataservice.AddUserAsync(new UserModel(username.Trim(), 
@@ -148,8 +149,24 @@ namespace VerseApp.Pages.Authentication
                                                              hashedPassword,
                                                              token));
 
-                progress = 97;
-                overlayMessage = "Saving your local token...";
+                data.currentUser = await dataservice.GetUser(username.Trim());
+                progress = 71;
+                StateHasChanged();
+                await Task.Delay(200);
+
+                Collection newCollection = new Collection();
+                newCollection.Title = "Favorites";
+                newCollection.UserVerses = new List<UserVerse>();
+                newCollection.Author = username.Trim();
+                newCollection.NumVerses = 0;
+                newCollection.Visibility = 2;
+                await dataservice.AddNewCollection(newCollection);
+                progress = 78;
+                StateHasChanged();
+                await Task.Delay(200);
+
+                progress = 89;
+                overlayMessage = "Saving your local signin...";
                 StateHasChanged();
                 await Task.Delay(200);
                 await localStorage.ClearAsync();

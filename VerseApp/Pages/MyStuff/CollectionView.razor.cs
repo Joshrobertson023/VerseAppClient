@@ -36,24 +36,27 @@ namespace VerseApp.Pages.MyStuff
         }
 
 
+        bool otherUserCollection = false;
+        bool authorized = false;
         protected override async Task OnInitializedAsync()
         {
             try
             {
                 int collectionId = Convert.ToInt32(_collectionId);
 
-                Collection existingCollection = data.currentUser.Collections.FirstOrDefault(c => c.Id == collectionId);
+                Collection pageCollection = data.currentUser.Collections.FirstOrDefault(c => c.Id == collectionId);
 
-                if (existingCollection != null)
+                if (pageCollection.UserVerses.First().Verses.Count() <= 0)
                 {
-                    currentCollection = existingCollection;
+                    pageCollection = await dataservice.GetVersesByCollectionAsync(pageCollection);
                 }
-                else
-                {
-                    currentCollection = await dataservice.GetCollectionAsync(collectionId);
-                    if (currentCollection != null)
-                    data.currentUser.Collections.Add(currentCollection);
-                }
+
+                // If the collection's author is not the current user:
+                otherUserCollection = pageCollection.UserId != data.currentUser.Id;
+                authorized = pageCollection.Visibility == 2 || (pageCollection.Visibility == 0 && !otherUserCollection);
+                // Implement if friends collection once friend logic is implemented
+
+                currentCollection = pageCollection;
             }
             catch (Exception ex)
             {

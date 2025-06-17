@@ -5,7 +5,7 @@ namespace DBAccessLibrary
 {
     public static class PasswordHash
     {
-        private const int Iterations = 20_000;
+        private const int Iterations = 2_000;
 
         private static readonly HashAlgorithmName HashAlgo = HashAlgorithmName.SHA256;
 

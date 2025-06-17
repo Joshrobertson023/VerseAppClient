@@ -491,6 +491,7 @@ namespace VerseApp.Pages.MyStuff
                 newCollection.Author = data.currentUser.Username;
                 newCollection.NumVerses = collectionVerses.Count;
                 newCollection.Visibility = visibility;
+                newCollection.UserId = data.currentUser.Id;
 
                 overlayVisible = true;
                 await dataservice.AddNewCollection(newCollection);
@@ -498,7 +499,12 @@ namespace VerseApp.Pages.MyStuff
                 {
                     uv.UserId = data.currentUser.Id;
                 }
+                progress = 47;
+                await Task.Delay(200);
                 await dataservice.AddUserVersesToNewCollection(collectionVerses);
+                progress = 78;
+                await Task.Delay(200);
+                data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
                 overlayVisible = false;
                 nav.NavigateTo("/");
             }

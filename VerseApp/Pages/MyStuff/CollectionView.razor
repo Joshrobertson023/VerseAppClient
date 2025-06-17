@@ -20,7 +20,7 @@
 </MudOverlay>
 
 
-<div class="single-stack" style="flex-direction: column; justify-content: flex-start;">
+<div class="single-stack hide-scrollbar" id="scrollContainer" style="flex-direction: column; justify-content: flex-start; overflow-y:auto;">
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div>
@@ -47,43 +47,50 @@
     }
     else
     {
-        @if (reorganizing) // Get dropzone code later
-        {
-            <div id="top-add" style="width: 100%;">
-                <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton>
-            </div>
-        }
-        else
-        {
-            <div id="top-add" style="width: 100%;">
-                <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
-                <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
-            </div>
-        }
-
-        @if (currentCollection.Author != data.currentUser.Username && currentCollection.Visibility == 0)
+        if (!authorized)
         {
             <h3 style="text-align: center; margin-bottom: 10%;">You do not have permission to access this page.</h3>
         }
         else
         {
-            <div class="single-stack">
-                @foreach (var userVerse in currentCollection.UserVerses)
-                {
-                    <div onclick="@(() => Expand(userVerse))">
-                        <h3>@userVerse.Reference</h3>
-                        @foreach (var verse in userVerse.Verses)
-                        {
-                            <p>@verse.Text</p>
-                        }
-                    </div>
-                    <MudCollapse Expanded="@userVerse.Expanded">
-                        <div>
-                            <p>Memorized: @userVerse.ProgressPercent</p>
+            @if (reorganizing) // Get dropzone code later
+            {
+                <div id="top-add" style="width: 100%;">
+                    <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton>
+                </div>
+            }
+            else
+            {
+                <div id="top-add" style="width: 100%;">
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
+                    <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
+                </div>
+            }
+
+            @if (currentCollection.Author != data.currentUser.Username && currentCollection.Visibility == 0)
+            {
+                <h3 style="text-align: center; margin-bottom: 10%;">You do not have permission to access this page.</h3>
+            }
+            else
+            {
+                <div class="user-verse">
+                    @foreach (var userVerse in currentCollection.UserVerses)
+                    {
+                        <div onclick="@(() => Expand(userVerse))">
+                            <h3>@userVerse.Reference</h3>
+                            @foreach (var verse in userVerse.Verses) 
+                            {
+                                <p>@verse.Text</p>
+                            }
                         </div>
-                    </MudCollapse>
-                }
-            </div>
+                        <MudCollapse Expanded="@userVerse.Expanded">
+                            <div>
+                                <p>Memorized: @userVerse.ProgressPercent</p>
+                            </div>
+                        </MudCollapse>
+                    }
+                </div>
+            }
         }
 
 }

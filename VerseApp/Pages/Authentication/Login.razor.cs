@@ -86,7 +86,7 @@ namespace VerseApp.Pages.Authentication
 
                 overlayVisible = true;
                 progress = 3;
-                overlayMessage = "Connecting to database...";
+                overlayMessage = "Connecting to server...";
                 StateHasChanged();
                 await Task.Delay(200);
                 message = "";
@@ -111,7 +111,7 @@ namespace VerseApp.Pages.Authentication
                 }
 
                 progress = 55;
-                overlayMessage = "Processing password...";
+                overlayMessage = "Checking your password...";
                 StateHasChanged();
                 await Task.Delay(200);
                 string passwordHash = await dataservice.GetPasswordHash(username);

@@ -266,15 +266,26 @@ namespace DBAccessLibrary
             }
         }
 
-        public async Task<List<Collection>> GetUserCollections(string username)
+        public async Task<List<Collection>> GetUserCollections(int userId)
         {
-            var response = await http.PostAsJsonAsync($"api/verse/getusercollections", username);
+            var response = await http.PostAsJsonAsync($"api/verse/getusercollections", userId);
             if (!response.IsSuccessStatusCode)
             {
                 var payload = await response.Content.ReadAsStringAsync();
                 throw new Exception($"API GetUserCollections failed ({(int)response.StatusCode}): {payload}");
             }
             return await response.Content.ReadFromJsonAsync<List<Collection>>();
+        }
+
+        public async Task<Collection> GetVersesByCollectionAsync(Collection collection)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/getversesbycollection", collection);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API GetVersesByCollectionId failed ({(int)response.StatusCode}): {payload}");
+            }
+            return await response.Content.ReadFromJsonAsync<Collection>();
         }
 
         public async Task DeleteCollectionAsync(int collectionId)

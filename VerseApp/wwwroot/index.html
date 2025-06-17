@@ -34,6 +34,16 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script>
+        window.scrollHelper = {
+            initializeElement: function (dotnetRef, el) {
+                el.addEventListener('scroll', () => {
+                    dotnetRef.invokeMethodAsync('OnScroll', el.scrollTop);
+                });
+            }
+        };
+
+    </script>
 
 </body>
 

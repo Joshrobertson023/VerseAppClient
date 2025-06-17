@@ -1,5 +1,6 @@
 ﻿@page "/"
 @namespace VerseApp.Pages.MyStuff
+@inject IJSRuntime JS
 
 <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
     <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
@@ -20,15 +21,23 @@
 </MudOverlay>
 
 
-<div class="single-stack" style="flex-direction: column; justify-content: flex-start; overflow-y: auto;">
-    @if (!string.IsNullOrEmpty(errorMessage))
+<div class="single-stack hide-scrollbar" id="scrollContainer" style="flex-direction: column; justify-content: flex-start; overflow-y:auto;">
+
+    <MudScrollToTop Class="scroll-to-top"
+                    Selector="#scrollContainer"
+                    VisibleCssClass="visible absolute"
+                    HiddenCssClass="invisible">
+        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Primary">Go to top</MudButton>
+    </MudScrollToTop>
+
+    @if (!string.IsNullOrEmpty(errorMessage)) 
     {
         <div>
             <MudIcon Size="Size.Small" Icon="@Icons.Material.Filled.Error" Title="Favorite" />
-            <p style="margin-left: 5px;">@errorMessage</p>
+            <p style="margin-left: 5px;">@errorMessage</p> 
         </div>
     }
-    @if (data.currentUser.Username == null || data.currentUser.Collections.Count == 0)
+    @if (isLoading == true) 
     {
         <div style="margin-bottom: 40px;"></div>
         <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;"/>
@@ -36,7 +45,7 @@
         <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
         <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
     }
-    else
+    else 
     {
         @if (reorganizing) // Get dropzone code later
         {
@@ -57,7 +66,7 @@
                 <a onclick="@(() => OpenCollection(collection))" style="display: flex; cursor: pointer; flex-direction: column; height: 100%; width: 80%; justify-content: space-between;">
                     <div style="display: flex; flex-direction: column;">
                         <h2>@collection.Title</h2>
-                        @if (collection.NumVerses == 1)
+                        @if (collection.NumVerses == 1) 
                         {
                             <p>@(collection.NumVerses + " Passage")</p>
                         }
@@ -90,7 +99,7 @@
                     <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Medium" Color="Color.Secondary" Style="margin-top: -10px !important; margin-right: -10px !important;">
                         <div>
                             <MudMenuItem OnClick="() => EditCollection(collection)">Edit</MudMenuItem>
-                            <MudMenuItem OnClick="() => ShareCollection(collection)">Share</MudMenuItem>
+                            <MudMenuItem OnClick="() => ShareCollection(collection)">Share</MudMenuItem> 
                             <MudMenuItem OnClick="() => PublishCollection(collection)">Publish</MudMenuItem>
                             <MudMenuItem OnClick="() => DeleteCollection(collection)">Delete</MudMenuItem>
                         </div>

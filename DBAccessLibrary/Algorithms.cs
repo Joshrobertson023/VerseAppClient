@@ -29,5 +29,35 @@ namespace DBAccessLibrary
                 throw new NotImplementedException("The type you are trying to sort has not been implemented.");
             }
         }
+
+        public static void SortCollections(List<Collection> collections, int sortBy, string customSort)
+        {
+            if (sortBy == 0)
+            {
+                collections.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.OrdinalIgnoreCase));
+            }
+            else if (sortBy == 1)
+            {
+                collections.Sort((x, y) => DateTime.Compare(x.DateCreated, y.DateCreated));
+            }
+            else if (sortBy == 2)
+            {
+                collections.Sort((x, y) => DateTime.Compare(x.LastPracticed, y.LastPracticed));
+            }
+            else if (sortBy == 3)
+            {
+                collections.Sort((x, y) => y.ProgressPercent.CompareTo(x.ProgressPercent));
+            }
+            else if (sortBy == 4)
+            {
+                List<Collection> sortedCollections = new List<Collection>();
+
+                foreach (var sort in customSort.Split(','))
+                {
+                    sortedCollections.Add(collections.FirstOrDefault(c => c.Id == Convert.ToInt32(sort.Trim())));
+                }
+                collections = sortedCollections;
+            }
+        }
     }
 }

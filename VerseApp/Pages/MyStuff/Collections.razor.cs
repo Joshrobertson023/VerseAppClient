@@ -1,11 +1,13 @@
 ﻿using DBAccessLibrary;
 using DBAccessLibrary.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using MudBlazor;
+using static MudBlazor.CategoryTypes;
 
 namespace VerseApp.Pages.MyStuff
 {
-    public partial class Collections : ComponentBase
+    public partial class Collections
     {
         [Inject]
         NavigationManager nav { get; set; }
@@ -22,6 +24,7 @@ namespace VerseApp.Pages.MyStuff
         private string errorMessage { get; set; }
         private bool reorganizing = false;
         private bool overlayVisible = false;
+        private int sortBy = 0; // 0 = Title, 1 = Date Created, 2 = Date Practiced, 3 = Most Completed, 4 = Custom
 
         private void ToggleOverlay()
         {
@@ -37,30 +40,28 @@ namespace VerseApp.Pages.MyStuff
             }
         }
 
-        protected override async Task OnAfterRenderAsync(bool firstRender)
+        private bool isLoading = true;
+        protected override async Task OnInitializedAsync()
         {
-            if (firstRender)
+            try
             {
-                while (string.IsNullOrEmpty(data.currentUser.Username) && DateTime.Now < DateTime.Now.AddSeconds(1))
+                while (data.currentUser.Id <= 0)
                 {
-                    await Task.Delay(200);
+                    await Task.Delay(100);
+                    Console.WriteLine("Waiting to get collections");
                 }
 
-                if (!string.IsNullOrEmpty(data.currentUser.Username))
-                {
-                    List<Collection> collections = await dataservice.GetUserCollections(data.currentUser.Username);
-                    foreach (var collection in collections)
-                    {
-                        if (!data.currentUser.Collections.Any(c => c.Id == collection.Id))
-                        {
-                            data.currentUser.Collections.Add(collection);
-                        }
-                    }
-                    StateHasChanged();
-                }
+                data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
+            }
+            catch (Exception ex)
+            {
+                errorMessage = ex.Message;
+            }
+            finally
+            {
+                isLoading = false;
             }
         }
-
 
         private void CloseDrawer()
         {
@@ -98,7 +99,7 @@ namespace VerseApp.Pages.MyStuff
             try
             {
                 bool? result = await dialogService.ShowMessageBox(
-                    "Are you sure you want to delete this collection?",
+                    "Are you sure you want to delete this collection and all passages in it? This cannot be undone.",
                     " ",
                     yesText: "Delete", cancelText: "Cancel");
                 if (result != null)
