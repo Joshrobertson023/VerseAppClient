@@ -28,6 +28,7 @@ namespace VerseApp.Pages.MyStuff
         [Parameter]
         public string _collectionId { get; set; } = string.Empty;
         Collection currentCollection { get; set; }
+        private string message { get; set; }
 
         private void ToggleOverlay()
         {
@@ -42,13 +43,18 @@ namespace VerseApp.Pages.MyStuff
         {
             try
             {
+                loading = true;
                 int collectionId = Convert.ToInt32(_collectionId);
 
                 Collection pageCollection = data.currentUser.Collections.FirstOrDefault(c => c.Id == collectionId);
 
-                if (pageCollection.UserVerses.First().Verses.Count() <= 0)
+                bool needsLoad = pageCollection.UserVerses == null || !pageCollection.UserVerses.Any()
+                    || pageCollection.UserVerses.All(uv => uv.Verses == null || !uv.Verses.Any());
+
+                if (needsLoad)
                 {
-                    pageCollection = await dataservice.GetVersesByCollectionAsync(pageCollection);
+                    Collection loaded = await dataservice.GetVersesByCollectionAsync(pageCollection);
+                    pageCollection.UserVerses = loaded.UserVerses;
                 }
 
                 // If the collection's author is not the current user:
@@ -61,6 +67,16 @@ namespace VerseApp.Pages.MyStuff
             catch (Exception ex)
             {
                 errorMessage = $"Error loading collection: {ex.Message}";
+                if (ex.Message.Contains("Sequence contains no elements"))
+                {
+                    loading = false;
+                    errorMessage = "";
+                    message = "No passages.";
+                }
+            }
+            finally
+            {
+                loading = false;
             }
         }
 

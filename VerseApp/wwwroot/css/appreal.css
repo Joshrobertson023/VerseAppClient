@@ -63,11 +63,51 @@ html, body, #app, .mud-main-content, .mud-layout, .single-stack {
         display: none !important;
     }
 
-.scroll-to-top {
-    z-index: 999999 !important;
-    top: 65px !important;
-    right: 10px !important;
+.scroll-to-top-wrapper {
+    position: fixed;
+    top: 75px;
+    left: 0;
+    width: 100%;
+    pointer-events: none;
+    z-index: var(--mud-zindex-appbar + 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
+
+.scroll-to-top-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: all;
+    background: transparent;
+    color: white;
+    padding: 8px 12px;
+    transform: translateY(30%);
+    border-radius: 4px;
+    cursor: pointer;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    outline: 2px solid #706D6D;
+    background: rgba(0, 0, 0, 0);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5.2px);
+    -webkit-backdrop-filter: blur(5.2px);
+}
+
+    /* when you want it shown */
+    .scroll-to-top-container.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    /* when hiding again */
+    .scroll-to-top-container.hidden {
+        visibility: hidden;
+        opacity: 0;
+    }
+
 
 
 .inner-content {
@@ -224,6 +264,7 @@ html, body, #app {
 
 .mud-drawer {
     background-color: #252525 !important;
+    z-index: 9999999 !important;
 }
 
 .mud-drawer-content {

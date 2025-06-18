@@ -37,13 +37,21 @@
             <h2 style="text-align: center;">@currentCollection.Title</h2>
         }
     </div>
-    @if (currentCollection == null)
+    @if (loading == true)
     {
         <div style="margin-bottom: 40px;"></div>
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
-        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="100px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="25%" Height="25px" Style="margin-top: 0px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="25%" Height="25px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="25%" Height="25px" Style="margin-top: 25px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="20px" Style="margin-top: 15px; border-radius: 6px;" />
     }
     else
     {
@@ -67,7 +75,11 @@
                 </div>
             }
 
-            @if (currentCollection.Author != data.currentUser.Username && currentCollection.Visibility == 0)
+            @if (!string.IsNullOrEmpty(message))
+            {
+                <h3 style="text-align: center; margin-bottom: 10%;">@message</h3>
+            }
+            else if (currentCollection.Author != data.currentUser.Username && currentCollection.Visibility == 0)
             {
                 <h3 style="text-align: center; margin-bottom: 10%;">You do not have permission to access this page.</h3>
             }

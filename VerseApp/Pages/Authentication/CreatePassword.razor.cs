@@ -160,6 +160,7 @@ namespace VerseApp.Pages.Authentication
                 newCollection.Author = username.Trim();
                 newCollection.NumVerses = 0;
                 newCollection.Visibility = 2;
+                newCollection.UserId = data.currentUser.Id;
                 await dataservice.AddNewCollection(newCollection);
                 progress = 78;
                 StateHasChanged();

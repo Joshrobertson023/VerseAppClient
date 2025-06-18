@@ -17,6 +17,8 @@ namespace VerseApp.Pages.MyStuff
         Data data { get; set; }
         [Inject]
         private IDialogService dialogService { get; set; }
+        [Inject]
+        CurrentPageStructure pageStructure { get; set; }
         public bool addingVerse { get; set; }
         private bool loading { get; set; }
         private int progress;
@@ -36,13 +38,25 @@ namespace VerseApp.Pages.MyStuff
         {
             if (collection != null)
             {
+                pageStructure.MyStuff = $"/mystuff/collection/{collection.Id}";
                 nav.NavigateTo($"/mystuff/collection/{collection.Id}");
+            }
+        }
+
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if (firstRender)
+            {
+                // now that the Razor markup (and your #scrollTopBtn) is in the DOM,
+                // wire up the scroll + click handlers
+                await JSRuntime.InvokeVoidAsync("scrollToTopInit");
             }
         }
 
         private bool isLoading = true;
         protected override async Task OnInitializedAsync()
         {
+            pageStructure.MyStuff = "/";
             try
             {
                 while (data.currentUser.Id <= 0)
@@ -51,7 +65,8 @@ namespace VerseApp.Pages.MyStuff
                     Console.WriteLine("Waiting to get collections");
                 }
 
-                data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
+                if (data.currentUser.Collections == null || data.currentUser.Collections.Count == 0)
+                    data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
             }
             catch (Exception ex)
             {
@@ -60,6 +75,9 @@ namespace VerseApp.Pages.MyStuff
             finally
             {
                 isLoading = false;
+                Console.WriteLine("Collections loaded.");
+                foreach (var collection in data.currentUser.Collections)
+                    Console.WriteLine($"Collection: {collection.Title}, ID: {collection.Id}");
             }
         }
 
@@ -76,6 +94,7 @@ namespace VerseApp.Pages.MyStuff
 
         private void AddCollection() // User gets max of 50 collections, with 100 verses max each
         {
+            pageStructure.MyStuff = "/mystuff/newcollection";
             nav.NavigateTo("/mystuff/newcollection");
         }
 

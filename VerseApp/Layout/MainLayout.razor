@@ -2,6 +2,7 @@
 @inherits LayoutComponentBase
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject MudTheme AppTheme
+@inject CurrentPageStructure pageStructure
 <MudThemeProvider @ref="_mudThemeProvider" @bind-IsDarkMode="_isDarkMode" Theme="AppTheme" />
 <MudPopoverProvider />
 <MudDialogProvider />
@@ -255,6 +256,12 @@
     {
         var token = await localStorage.GetItemAsync<string>("authToken");
 
+        pageStructure.MyStuff = "/";
+        pageStructure.Practice = "/practice";
+        pageStructure.Search = "/search";
+        pageStructure.Bible = "/bible";
+        pageStructure.Community = "/community";
+
         if (string.IsNullOrWhiteSpace(token))
         {
             Console.WriteLine("token is null");
@@ -329,7 +336,15 @@
         secondOpen = false;
         thirdOpen = false;
         fourthOpen = false;
-        nav.NavigateTo("/");
+        if (nav.Uri == pageStructure.MyStuff)
+        {
+            nav.NavigateTo("/");
+        }
+        else
+        {
+            nav.NavigateTo("/");
+            nav.NavigateTo(pageStructure.MyStuff);
+        }
     }
 
     private void Practice_Click()

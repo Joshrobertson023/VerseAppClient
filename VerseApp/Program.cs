@@ -6,6 +6,7 @@ using DBAccessLibrary;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
+using DBAccessLibrary.Models;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -17,6 +18,7 @@ builder.Services.AddHttpClient<DataService>(client =>
 });
 
 builder.Services.AddSingleton<Data>();
+builder.Services.AddSingleton<CurrentPageStructure>();
 builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 builder.Services.AddMudServices(service =>

@@ -1,6 +1,6 @@
 ﻿@page "/"
 @namespace VerseApp.Pages.MyStuff
-@inject IJSRuntime JS
+@inject IJSRuntime JSRuntime
 
 <MudOverlay @bind-Visible="overlayVisible" @onclick="CloseDrawer" DarkBackground>
     <MudProgressCircular Style="height: 80px; width: 80px" Color="Color.Secondary" Value="@progress">
@@ -20,15 +20,15 @@
     }
 </MudOverlay>
 
+<div class="scroll-to-top-wrapper">
+    <div id="scrollTopBtn"
+         class="scroll-to-top-container hidden animate__animated animate__faster">
+        ↑ Go to Top
+    </div>
+</div>
 
-<div class="single-stack hide-scrollbar" id="scrollContainer" style="flex-direction: column; justify-content: flex-start; overflow-y:auto;">
+<div class="single-stack hide-scrollbar" id="scrollContainer" style="flex-direction: column; justify-content: flex-start; overflow-y:auto; display:relative;">
 
-    <MudScrollToTop Class="scroll-to-top"
-                    Selector="#scrollContainer"
-                    VisibleCssClass="visible absolute"
-                    HiddenCssClass="invisible">
-        <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.ArrowUpward" Color="Color.Primary">Go to top</MudButton>
-    </MudScrollToTop>
 
     @if (!string.IsNullOrEmpty(errorMessage)) 
     {
@@ -47,7 +47,7 @@
     }
     else 
     {
-        @if (reorganizing) // Get dropzone code later
+        @if (reorganizing) // Get dropzone code later  
         {
             <div id="top-add" style="width: 100%;">
                 <MudButton Variant="Variant.Outlined" Color="Color.Secondary">Done</MudButton> 

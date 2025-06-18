@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&family=Mulish:ital,wght@0,200..1000;1,200..1000&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
     <link rel="stylesheet" href="css/appreal.css" />
     <!-- If you add any scoped CSS files, uncomment the following to load them
     <link href="VerseApp.styles.css" rel="stylesheet" /> -->
@@ -34,16 +35,7 @@
     </div>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
-    <script>
-        window.scrollHelper = {
-            initializeElement: function (dotnetRef, el) {
-                el.addEventListener('scroll', () => {
-                    dotnetRef.invokeMethodAsync('OnScroll', el.scrollTop);
-                });
-            }
-        };
-
-    </script>
+    <script src="js/scrollToTop.js"></script>
 
 </body>
 
