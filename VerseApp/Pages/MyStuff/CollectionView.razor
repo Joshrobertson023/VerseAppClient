@@ -70,8 +70,16 @@
             else
             {
                 <div id="top-add" style="width: 100%;">
-                    <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
-                    <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Medium" Color="Color.Secondary">
+                        <div>
+                            <MudMenuItem>Add Passage</MudMenuItem>
+                            <MudMenuItem>Edit Collection</MudMenuItem>
+                            <MudMenuItem>Reorder</MudMenuItem>
+                            <MudMenuItem>Collapse All</MudMenuItem>
+                            <MudMenuItem>Expand All</MudMenuItem>
+                        </div>
+                    </MudMenu>
+                    <MudButton OnClick="AddPassage" Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
                 </div>
             }
 
@@ -85,23 +93,70 @@
             }
             else
             {
-                <div class="user-verse">
-                    @foreach (var userVerse in currentCollection.UserVerses)
-                    {
-                        <div onclick="@(() => Expand(userVerse))">
-                            <h3>@userVerse.Reference</h3>
+                @foreach (var userVerse in currentCollection.UserVerses)
+                {
+                    <MudPaper Class="pa-4" Style="margin-bottom: 25px;">
+                        <div style="cursor: pointer; pointer-events: all;" @onclick="@(() => Expand(userVerse))">
+                            <h3 class="h3">@userVerse.Reference</h3>
                             @foreach (var verse in userVerse.Verses) 
                             {
-                                <p>@verse.Text</p>
+                                <h4 style="margin-top: 10px; margin-bottom: 10px;" class="h4"><span class="h4">@verse.VerseNumber</span> @verse.Text</h4>
+                                <MudCollapse Expanded="@userVerse.Expanded">
+                                    <div style="display: flex; justify-content: center; flex-direction: column; align-items: start; margin-bottom: 10px;">
+                                        <div style="display: flex; justify-content: flex-start; align-items: center;">
+                                            <MudIcon Style="    font-size: 1rem !important;
+                                                                        width: 0.9em !important;
+                                                                        height: 0.9em !important;" Icon="@Icons.Material.Filled.People"></MudIcon><p class="tiny-text" style="margin-left: 5px;">@(verse.UsersSaved) People have this verse</p>
+                                        </div>
+                                        <div style="display: flex; justify-content: flex-start; align-items: center;">
+                                            <MudIcon Style="    font-size: 1rem !important;
+                                                                        width: 0.9em !important;
+                                                                                            height: 0.9em !important;" Icon="@Icons.Material.Filled.DoneAll"></MudIcon><p class="tiny-text" style="margin-left: 5px;">@(verse.UsersMemorized) People have memorized this verse</p>
+                                        </div>
+                                    </div>
+                                </MudCollapse>
                             }
+                            <MudCollapse Expanded="@(userVerse.Expanded)">
+                                @if (data.collapsedBefore == false)
+                                {
+                                    <p>(Click above to collapse)</p>
+                                }
+                            </MudCollapse>
                         </div>
+                        <MudDivider Style="margin-top: 10px; margin-bottom: 10px;" />
                         <MudCollapse Expanded="@userVerse.Expanded">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div style="display: flex; flex-direction: column; justify-content: center; align-items: stretch;">
+                                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                                        <div>
+                                            <MudIcon Style="margin-left: -5px;" Icon="@Icons.Material.Filled.Lightbulb"></MudIcon>
+                                        </div>
+                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start">
+                                            <h3 style="margin-bottom: -6px;">@(userVerse.ProgressPercent.ToString())%</h3>
+                                            <p>Memorized</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <MudButton Variant="Variant.Outlined" Size="Size.Small" Style="height: 20px !important; margin-top: 4px; width: 100% !important;" Color="Color.Secondary">Practice</MudButton>
+                                    </div>
+                                </div>
+                                <div>
+                                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Size="Size.Medium" Color="Color.Secondary">
+                                        <div>
+                                            <MudMenuItem >Move to Collection</MudMenuItem>
+                                            <MudMenuItem >Create New Collection</MudMenuItem>
+                                            <MudMenuItem >Share</MudMenuItem>
+                                            <MudMenuItem >Delete</MudMenuItem>
+                                        </div>
+                                    </MudMenu>
+                                </div>
+                            </div>
                             <div>
-                                <p>Memorized: @userVerse.ProgressPercent</p>
+                                <p style="margin-top: 10px;" class="tiny-text">Saved @(userVerse.DateAdded.ToShortDateString())</p>
                             </div>
                         </MudCollapse>
-                    }
-                </div>
+                    </MudPaper>
+                }
             }
         }
 

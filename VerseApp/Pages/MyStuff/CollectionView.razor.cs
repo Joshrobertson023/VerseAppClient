@@ -82,7 +82,13 @@ namespace VerseApp.Pages.MyStuff
 
         private void Expand(UserVerse userVerse)
         {
+            data.collapsedBefore = true;
             userVerse.Expanded = !userVerse.Expanded;
+        }
+
+        private void AddPassage()
+        {
+
         }
 
         private async Task Back_Click()

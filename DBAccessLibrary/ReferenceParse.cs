@@ -115,5 +115,14 @@ namespace DBAccessLibrary
 
             return returnList;
         }
+
+        public static string GetVerseNumber(string reference)
+        {
+            string[] parts = reference.Split(':');
+            if (parts.Length > 1)
+                return parts[1].Trim();
+            else
+                return string.Empty;
+        }
     }
 }

@@ -15,5 +15,9 @@ namespace DBAccessLibrary.Models
         public int UsersMemorized { get; set; }
         public int InYourLists { get; set; }
         public int YouMemorized { get; set; }
+        public string VerseNumber
+        {
+            get => ReferenceParse.GetVerseNumber(Reference);
+        }
     }
 }

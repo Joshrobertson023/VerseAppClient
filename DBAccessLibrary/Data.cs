@@ -14,6 +14,10 @@ namespace DBAccessLibrary
         public UserModel currentUser;
         public List<RecoveryInfo> recoveryInfo;
 
+        public bool collapsedBefore = false;
+
+        public LoginInfo loginInfo = new LoginInfo();
+
         public string[] Admins { get; } = new[]
         {
             "Joshrobertson023"

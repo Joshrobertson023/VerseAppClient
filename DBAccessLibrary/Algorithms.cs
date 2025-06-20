@@ -30,15 +30,17 @@ namespace DBAccessLibrary
             }
         }
 
-        public static void SortCollections(List<Collection> collections, int sortBy, string customSort)
+        public static List<Collection> Sort(List<Collection> _collections, int sortBy)
         {
+            List<Collection> collections = new List<Collection>();
+
             if (sortBy == 0)
             {
-                collections.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.OrdinalIgnoreCase));
+                collections.Sort((x, y) => DateTime.Compare(y.DateCreated, x.DateCreated));
             }
             else if (sortBy == 1)
             {
-                collections.Sort((x, y) => DateTime.Compare(x.DateCreated, y.DateCreated));
+                collections.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.OrdinalIgnoreCase));
             }
             else if (sortBy == 2)
             {
@@ -50,14 +52,46 @@ namespace DBAccessLibrary
             }
             else if (sortBy == 4)
             {
-                List<Collection> sortedCollections = new List<Collection>();
+                return _collections;
+            }
 
-                foreach (var sort in customSort.Split(','))
+            return collections;
+        }
+
+        public static (string, List<Collection>) SortCustom(List<Collection> collections, int sortBy)
+        {
+            List<Collection> sortedCollections = new List<Collection>();
+            string newSort = string.Empty;
+            
+            if (sortBy == 4)
+            {
+                foreach (var collection in collections)
                 {
-                    sortedCollections.Add(collections.FirstOrDefault(c => c.Id == Convert.ToInt32(sort.Trim())));
+                    if (collection.Pinned == 1)
+                        sortedCollections.Add(collection);
                 }
+
+                foreach (var collection in collections)
+                {
+                    if (!sortedCollections.Contains(collection) && collection.Pinned == 0)
+                        sortedCollections.Add(collection);
+                }
+
+                foreach (var collection in sortedCollections)
+                {
+                    newSort += $"{collection.Id},";
+                }
+
                 collections = sortedCollections;
             }
+
+            //foreach (var order in newSort.Split(',').Where(o => !string.IsNullOrEmpty(o)))
+            //{
+            //    Collection col = collections.FirstOrDefault(c => c.Id.ToString() == order);
+            //    collections.Add(col);
+            //}
+
+            return (newSort, collections);
         }
     }
 }

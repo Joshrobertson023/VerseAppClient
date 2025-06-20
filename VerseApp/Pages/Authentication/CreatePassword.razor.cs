@@ -16,6 +16,8 @@ namespace VerseApp.Pages.Authentication
         Data data { get; set; }
         [Inject]
         DataService dataservice { get; set; }
+        [Inject]
+        LoginInfo loginInfo { get; set; }
         [Parameter]
         public string username { get; set; }
         [Parameter]
@@ -83,6 +85,15 @@ namespace VerseApp.Pages.Authentication
             StateHasChanged();
         }
 
+        protected override async Task OnInitializedAsync()
+        {
+            if (!string.IsNullOrEmpty(loginInfo.Password))
+                password = loginInfo.Password;
+
+            if (!string.IsNullOrEmpty(loginInfo.RepeatPassword))
+                confirmPassword = loginInfo.RepeatPassword;
+        }
+
         private void CloseDrawer()
         {
 
@@ -98,6 +109,10 @@ namespace VerseApp.Pages.Authentication
 
         private void Back2_Click()
         {
+            if (!string.IsNullOrEmpty(password))
+                loginInfo.Password = password;
+            if (!string.IsNullOrEmpty(confirmPassword))
+                loginInfo.RepeatPassword = confirmPassword;
             nav.NavigateTo("/authentication/createaccount");
         }
 
@@ -161,6 +176,8 @@ namespace VerseApp.Pages.Authentication
                 newCollection.NumVerses = 0;
                 newCollection.Visibility = 2;
                 newCollection.UserId = data.currentUser.Id;
+                newCollection.Pinned = 1;
+                newCollection.VerseOrder = "none";
                 await dataservice.AddNewCollection(newCollection);
                 progress = 78;
                 StateHasChanged();
@@ -197,6 +214,10 @@ namespace VerseApp.Pages.Authentication
 
         private void DataPrivacy_Click()
         {
+            if (!string.IsNullOrEmpty(password))
+                loginInfo.Password = password;
+            if (!string.IsNullOrEmpty(confirmPassword))
+                loginInfo.RepeatPassword = confirmPassword;
             nav.NavigateTo("/authentication/dataprivacy");
         }
     }

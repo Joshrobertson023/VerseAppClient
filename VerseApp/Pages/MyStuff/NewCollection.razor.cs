@@ -68,6 +68,7 @@ namespace VerseApp.Pages.MyStuff
         private bool showAddPassage = true;
         private bool addedPassage = false;
         private int visibility = 2; // 0 = private, 1 = friends, 2 = public
+        private bool searching = false;
 
         private string book
         {
@@ -125,6 +126,8 @@ namespace VerseApp.Pages.MyStuff
         private async Task Apply_Click()
         {
             message = "";
+            drawerMessage = string.Empty;
+            drawerVerse = new UserVerse();
             if (!selectedVerses.Any())
             {
                 errorMessage = "Please select at least one verse.";
@@ -133,16 +136,23 @@ namespace VerseApp.Pages.MyStuff
 
             try
             {
+                searching = true;
                 showAddPassage = true;
                 overflow = false;
                 search = string.Empty;
-                drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = book, Chapter = chapter, Verses = selectedVerses.ToList() });
+                var verses = selectedVerses.ToList();
+                verses.Sort();
+                drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = book, Chapter = chapter, Verses = verses });
                 addedPassage = false;
             }
             catch (Exception ex)
             {
                 errorMessage = ex.Message;
                 return;
+            }
+            finally
+            {
+                searching = false;
             }
         }
 
@@ -154,276 +164,295 @@ namespace VerseApp.Pages.MyStuff
                 return;
             }
 
-            //try
-            //{
-            string search = userSearch.Trim();
-            string reference = string.Empty;
-            search += " "; // Terminate with special character
-                           // Check for proper format: book chapter verses
-                           // if first word is not a book name, then search by keyword(s)
-            string firstWord = string.Empty;
-            int i = 0;
-            // Get the book
-            for (i = 0; i < search.Length; i++)
+            try
             {
-                char letter = search[i];
-                if (i > 1)
-                    if (char.IsWhiteSpace(letter) || char.IsPunctuation(letter))
-                        break;
-                firstWord += letter;
-                if (i + 1 == search.Length)
-                    throw new Exception("Invalid search format.");
-            }
-
-            firstWord = firstWord.Trim();
-            firstWord = firstWord.ToLower();
-
-            // Check if the first word is a book of the Bible
-            bool found = false;
-            foreach (var book in data.booksOfBibleSearch)
-            {
-                if (!found)
+                searching = true;
+                drawerMessage = string.Empty;
+                drawerVerse = new UserVerse();
+                string search = userSearch.Trim();
+                string reference = string.Empty;
+                search += " "; // Terminate with special character
+                               // Check for proper format: book chapter verses
+                               // if first word is not a book name, then search by keyword(s)
+                string firstWord = string.Empty;
+                int i = 0;
+                // Get the book
+                for (i = 0; i < search.Length; i++)
                 {
-                    foreach (var searchTerm in book.Value)
+                    char letter = search[i];
+                    if (i > 1)
+                        if (char.IsWhiteSpace(letter) || char.IsPunctuation(letter))
+                            break;
+                    firstWord += letter;
+                    if (i + 1 == search.Length)
+                        throw new Exception("Invalid search format.");
+                }
+
+                firstWord = firstWord.Trim();
+                firstWord = firstWord.ToLower();
+
+                // Check if the first word is a book of the Bible
+                bool found = false;
+                foreach (var book in data.booksOfBibleSearch)
+                {
+                    if (!found)
                     {
-                        if (!found)
+                        foreach (var searchTerm in book.Value)
                         {
-                            if (firstWord == searchTerm)
+                            if (!found)
                             {
-                                firstWord = book.Key;
-                                reference += book.Key + " ";
-                                found = true;
+                                if (firstWord == searchTerm)
+                                {
+                                    firstWord = book.Key;
+                                    reference += book.Key + " ";
+                                    found = true;
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            if (found)
-            {
-                // Search by reference
-                drawerMessage = "Showing results for:" + search;
-                showAddPassage = true;
-                string _book = firstWord;
-                int _chapter = 0;
-                string chapterString = string.Empty;
-
-                // You know the next number will be the chapter
-                // You know after that, it will be all verses
-
-                // Get the chapter
-                for (; i < search.Length; i++)
+                if (found)
                 {
-                    if (char.IsNumber(search[i]))
-                    {
-                        chapterString += search[i];
-                        if (i < search.Length - 1)
-                        {
-                            if (!char.IsNumber(search[i + 1]))
-                                break;
-                            if (i + 1 == search.Length)
-                                throw new Exception("Invalid search format.");
-                        }
-                    }
-                }
-                _chapter = int.TryParse(chapterString, out int chapterResult) ? chapterResult : throw new Exception("Error getting chapter.");
-                reference += _chapter.ToString() + ":";
-                Console.WriteLine($"Book: {_book}, Chapter: {_chapter}");
+                    // Search by reference
+                    showAddPassage = true;
+                    string _book = firstWord;
+                    int _chapter = 0;
+                    string chapterString = string.Empty;
 
-                List<int> _verses = new List<int>();
-                string numberString = string.Empty;
-                List<string> verseRanges = new();
-                string verseRange = string.Empty;
+                    // You know the next number will be the chapter
+                    // You know after that, it will be all verses
 
-                // Get the verses
-                i++;
-                // Get the readable reference
-                for (int r = i+1; r < search.Length; r++)
-                {
-                    reference += search[r];
-                }
-
-                verseRange = ",";
-                for (; i < search.Length; i++)
-                {
-                    // Get next verse number as string
-                    numberString = "";
+                    // Get the chapter
                     for (; i < search.Length; i++)
                     {
-                        // Add to numberString until hit non number
-                        // If verseRange ends in -, add the numberString to verseRange. Add it to list, reset verseRange
-                        // Else:
-                        // Check if - or ,
-                        // If - then add numberString to verseRange, reset numberString
-                        // If , or a space then add the numberString to _verses and reset numberString
                         if (char.IsNumber(search[i]))
                         {
-                            numberString += search[i];
+                            chapterString += search[i];
                             if (i < search.Length - 1)
+                            {
                                 if (!char.IsNumber(search[i + 1]))
                                     break;
+                                if (i + 1 == search.Length)
+                                    throw new Exception("Invalid search format.");
+                            }
                         }
                     }
+                    _chapter = int.TryParse(chapterString, out int chapterResult) ? chapterResult : throw new Exception("Error getting chapter.");
+                    reference += _chapter.ToString() + ":";
+                    Console.WriteLine($"Book: {_book}, Chapter: {_chapter}");
 
-                    if (i < search.Length - 1)
-                        Console.WriteLine("Search[i]: " + search[i]);
-                    if (verseRange[verseRange.Length - 1] == '-')
+                    List<int> _verses = new List<int>();
+                    string numberString = string.Empty;
+                    List<string> verseRanges = new();
+                    string verseRange = string.Empty;
+
+                    // Get the verses
+                    i++;
+                    // Get the readable reference
+                    for (int r = i + 1; r < search.Length; r++)
                     {
-                        verseRange += numberString;
-                        verseRanges.Add(verseRange);
-                        Console.WriteLine("verseRange ends with '-'. Adding" + numberString + " to verseRange: " + verseRange);
-                        numberString = string.Empty;
-                        verseRange = ",";
+                        reference += search[r];
                     }
-                    else
+
+                    verseRange = ",";
+                    for (; i < search.Length; i++)
                     {
+                        // Get next verse number as string
+                        numberString = "";
+                        for (; i < search.Length; i++)
+                        {
+                            // Add to numberString until hit non number
+                            // If verseRange ends in -, add the numberString to verseRange. Add it to list, reset verseRange
+                            // Else:
+                            // Check if - or ,
+                            // If - then add numberString to verseRange, reset numberString
+                            // If , or a space then add the numberString to _verses and reset numberString
+                            if (char.IsNumber(search[i]))
+                            {
+                                numberString += search[i];
+                                if (i < search.Length - 1)
+                                    if (!char.IsNumber(search[i + 1]))
+                                        break;
+                            }
+                        }
+
                         if (i < search.Length - 1)
+                            Console.WriteLine("Search[i]: " + search[i]);
+                        if (verseRange[verseRange.Length - 1] == '-')
                         {
-                            if (search[i + 1] == '-')
+                            verseRange += numberString;
+                            verseRanges.Add(verseRange);
+                            Console.WriteLine("verseRange ends with '-'. Adding" + numberString + " to verseRange: " + verseRange);
+                            numberString = string.Empty;
+                            verseRange = ",";
+                        }
+                        else
+                        {
+                            if (i < search.Length - 1)
                             {
-                                verseRange += numberString + "-";
-                                Console.WriteLine("verseRange does not end with '-'. Adding" + numberString + " + \"-\" to verseRange: " + verseRange);
-                                numberString = string.Empty;
+                                if (search[i + 1] == '-')
+                                {
+                                    verseRange += numberString + "-";
+                                    Console.WriteLine("verseRange does not end with '-'. Adding" + numberString + " + \"-\" to verseRange: " + verseRange);
+                                    numberString = string.Empty;
+                                }
+                                else// if (search[i+1] == ',' || search[i+1] == ' ')
+                                {
+                                    Console.WriteLine("Adding to verses, numberString: " + numberString);
+                                    _verses.Add(int.TryParse(numberString, out int verseResult) ? verseResult : throw new Exception("Error getting verse."));
+                                    numberString = string.Empty;
+                                }
+                                Console.WriteLine("verseRange: " + verseRange);
+                                Console.WriteLine("search[i]: " + search[i]);
                             }
-                            else// if (search[i+1] == ',' || search[i+1] == ' ')
+                        }
+                    }
+
+                    // Get all verses from ranges
+                    foreach (var _range in verseRanges)
+                    {
+                        string range = _range + ",";
+                        string firstNumber = string.Empty;
+                        string secondNumber = string.Empty;
+                        int j = 0;
+                        for (; j < range.Length; j++)
+                        {
+                            if (char.IsNumber(range[j]))
                             {
-                                Console.WriteLine("Adding to verses, numberString: " + numberString);
-                                _verses.Add(int.TryParse(numberString, out int verseResult) ? verseResult : throw new Exception("Error getting verse."));
-                                numberString = string.Empty;
+                                firstNumber += range[j];
+                                if (j < range.Length - 1)
+                                    if (!char.IsNumber(range[j + 1]))
+                                        break;
                             }
-                            Console.WriteLine("verseRange: " + verseRange);
-                            Console.WriteLine("search[i]: " + search[i]);
                         }
+                        j++;
+                        for (; j < range.Length; j++)
+                        {
+                            if (char.IsNumber(range[j]))
+                            {
+                                secondNumber += range[j];
+                                if (j < range.Length - 1)
+                                    if (!char.IsNumber(range[j + 1]))
+                                        break;
+                            }
+                        }
+
+                        int first = int.TryParse(firstNumber, out int firstResult) ? firstResult : throw new Exception("Error getting first verse in range.");
+                        int second = int.TryParse(secondNumber, out int secondResult) ? secondResult : throw new Exception("Error getting second verse in range.");
+
+                        Console.WriteLine($"Adding verses from range: {first} to {second}");
+                        if (first > second)
+                        {
+                            int temp = first;
+                            first = second;
+                            second = temp;
+                        }
+
+                        for (int k = first; k <= second; k++)
+                        {
+                            if (!_verses.Contains(k))
+                                _verses.Add(k);
+                        }
+
+                    }
+
+                    Console.WriteLine($"Book: {_book}, Chapter: {_chapter}, Verses: {string.Join(", ", _verses)}");
+                    drawerMessage = "Showing results for " + userSearch;
+                    try
+                    {
+                        Console.WriteLine("_verses.Count: " + _verses.Count);
+                        if (_verses.Count <= 0)
+                        {
+                            Console.WriteLine("Getting whole chapter.");
+                            Console.WriteLine("BibleStructure.GetNumberVerses(data.booksOfBible[i], _chapter): " + BibleStructure.GetNumberVerses(data.booksOfBible[i], _chapter));
+                            // Get the whole chapter
+                            int totalVerses = BibleStructure.GetNumberVerses(_book, _chapter);
+                            for (int j = 1; j <= totalVerses; j++)
+                            {
+                                _verses.Add(j);
+                            }
+                        }
+                        Console.WriteLine("_verses: " + string.Join(", ", _verses));
+                        _verses.Sort();
+                        drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = _book, Chapter = _chapter, Verses = _verses });
+                        drawerVerse.Reference = reference;
+                        foreach (var verse in drawerVerse.Verses)
+                        {
+                            Console.WriteLine("VerseId: " + verse.Id + ", Text: " + verse.Text);
+                        }
+                        addedPassage = false;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message.Contains("request timed out"))
+                        {
+                            await Search_Click();
+                            Console.WriteLine("Request timed out.");
+                            return;
+                        }
+                        else
+                        {
+                            drawerMessage = "Improper reference format." + ex.Message;
+                        }
+                    }
+                    finally
+                    {
+                        drawerMessage = "Showing results for " + search.Trim();
                     }
                 }
-
-                // Get all verses from ranges
-                foreach (var _range in verseRanges)
+                else
                 {
-                    string range = _range + ",";
-                    string firstNumber = string.Empty;
-                    string secondNumber = string.Empty;
-                    int j = 0;
-                    for (; j < range.Length; j++)
+                    // Search by keywords / exact phrase
+                    showAddPassage = false;
+
+                    List<string> keywords = new List<string>();
+
+                    string keyword = string.Empty;
+                    for (int k = 0; k < search.Length; k++)
                     {
-                        if (char.IsNumber(range[j]))
+                        if (char.IsLetter(search[k]))
                         {
-                            firstNumber += range[j];
-                            if (j < range.Length - 1)
-                                if (!char.IsNumber(range[j + 1]))
-                                    break;
+                            keyword += search[k];
+                            if (k < search.Length - 1)
+                            {
+                                if (!char.IsLetter(search[k + 1]))
+                                {
+                                    keywords.Add(keyword);
+                                    Console.WriteLine("Adding keyword: " + keyword);
+                                    keyword = string.Empty;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            continue;
                         }
                     }
-                    j++;
-                    for (; j < range.Length; j++)
-                    {
-                        if (char.IsNumber(range[j]))
-                        {
-                            secondNumber += range[j];
-                            if (j < range.Length - 1)
-                                if (!char.IsNumber(range[j + 1]))
-                                    break;
-                        }
-                    }
-
-                    int first = int.TryParse(firstNumber, out int firstResult) ? firstResult : throw new Exception("Error getting first verse in range.");
-                    int second = int.TryParse(secondNumber, out int secondResult) ? secondResult : throw new Exception("Error getting second verse in range.");
-
-                    Console.WriteLine($"Adding verses from range: {first} to {second}");
-                    if (first > second)
-                    {
-                        int temp = first;
-                        first = second;
-                        second = temp;
-                    }
-
-                    for (int k = first; k <= second; k++)
-                    {
-                        if (!_verses.Contains(k))
-                            _verses.Add(k);
-                    }
-
-                }
-
-                Console.WriteLine($"Book: {_book}, Chapter: {_chapter}, Verses: {string.Join(", ", _verses)}");
-                drawerMessage = "Showing results for " + userSearch;
-                try
-                {
-                    Console.WriteLine("_verses.Count: " + _verses.Count);
-                    if (_verses.Count <= 0)
-                    {
-                        Console.WriteLine("Getting whole chapter.");
-                        Console.WriteLine("BibleStructure.GetNumberVerses(data.booksOfBible[i], _chapter): " + BibleStructure.GetNumberVerses(data.booksOfBible[i], _chapter));
-                        // Get the whole chapter
-                        int totalVerses = BibleStructure.GetNumberVerses(_book, _chapter);
-                        for (int j = 1; j <= totalVerses; j++)
-                        {
-                            _verses.Add(j);
-                        }
-                    }
-                    Console.WriteLine("_verses: " + string.Join(", ", _verses));
-                    _verses.Sort();
-                    drawerVerse = await dataservice.GetUserVerseByReferenceAsync(new Reference { Book = _book, Chapter = _chapter, Verses = _verses });
-                    drawerVerse.Reference = reference;
-                    foreach (var verse in drawerVerse.Verses)
-                    {
-                        Console.WriteLine("VerseId: " + verse.Id + ", Text: " + verse.Text);
-                    }
-                    addedPassage = false;
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message.Contains("request timed out"))
-                    {
-                        await Search_Click();
-                        Console.WriteLine("Request timed out.");
-                        return;
-                    }
-                    else
-                    {
-                        drawerMessage = "Improper reference format." + ex.Message;
-                    }
+                    Console.WriteLine("Keywords: " + string.Join(", ", keywords));
+                    drawerVerse = new UserVerse();
+                    drawerVerse.Verses = await dataservice.GetUserVerseByKeywordsAsync(keywords);
+                    drawerMessage = "Showing results for " + search;
                 }
             }
-            else
+            catch (Exception ex)
             {
-                // Search by keywords / exact phrase
-                drawerMessage = "Showing results for " + search;
-                showAddPassage = false;
-
-                List<string> keywords = new List<string>();
-
-                string keyword = string.Empty;
-                for (int k = 0; k < search.Length; k++)
+                errorMessage = ex.Message;
+                if (errorMessage.ToLower().Contains("timed out"))
                 {
-                    if (char.IsLetter(search[k]))
-                    {
-                        keyword += search[k];
-                        if (k < search.Length - 1)
-                        {
-                            if (!char.IsLetter(search[k + 1]))
-                            {
-                                keywords.Add(keyword);
-                                Console.WriteLine("Adding keyword: " + keyword);
-                                keyword = string.Empty;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        continue;
-                    }
+                    errorMessage = "Connection timed out.";
+                    overlayMessage = $"We had trouble connecting.\nRetrying...";
+                    await Search_Click();
                 }
-                Console.WriteLine("Keywords: " + string.Join(", ", keywords));
-                drawerVerse = new UserVerse();
-                drawerVerse.Verses = await dataservice.GetUserVerseByKeywordsAsync(keywords);
+                else
+                {
+                    errorMessage = "We encountered an error. Please try again. " + ex.Message;
+                }
             }
-            //}
-            //catch (Exception ex)
-            //{
-            //    errorMessage = ex.Message;
-            //    return;
-            //}
+            finally
+            {
+                searching = false;
+            }
         }
 
         private async Task CheckForEnterKey(KeyboardEventArgs e)
@@ -492,6 +521,7 @@ namespace VerseApp.Pages.MyStuff
                 newCollection.NumVerses = collectionVerses.Count;
                 newCollection.Visibility = visibility;
                 newCollection.UserId = data.currentUser.Id;
+                newCollection.VerseOrder = string.Join(",", collectionVerses.Select(uv => uv.Reference).Distinct().OrderBy(r => r));
 
                 overlayVisible = true;
                 await dataservice.AddNewCollection(newCollection);
@@ -502,6 +532,7 @@ namespace VerseApp.Pages.MyStuff
                 progress = 47;
                 await Task.Delay(200);
                 await dataservice.AddUserVersesToNewCollection(collectionVerses);
+                data.currentUser.CollectionsOrder += newCollection.Id + ",";
                 progress = 78;
                 await Task.Delay(200);
                 data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);

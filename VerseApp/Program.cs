@@ -1,12 +1,16 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using VerseApp;
-using MudBlazor.Services;
+﻿using Blazored.LocalStorage;
 using DBAccessLibrary;
-using Blazored.LocalStorage;
+using DBAccessLibrary.Models;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using MudBlazor;
-using DBAccessLibrary.Models;
+using MudBlazor.Charts;
+using MudBlazor.Services;
+using System.Diagnostics.Metrics;
+using System.Drawing;
+using VerseApp;
+using static System.Net.Mime.MediaTypeNames;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -19,6 +23,7 @@ builder.Services.AddHttpClient<DataService>(client =>
 
 builder.Services.AddSingleton<Data>();
 builder.Services.AddSingleton<CurrentPageStructure>();
+builder.Services.AddSingleton<LoginInfo>();
 builder.Services.AddBlazoredLocalStorageAsSingleton();
 
 builder.Services.AddMudServices(service =>
@@ -69,16 +74,20 @@ builder.Services.AddMudServices(service =>
             H3 = new H3Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "0.8rem",
+                FontSize = "0.9rem",
                 FontWeight = "500",
                 LineHeight = "1.7",
                 LetterSpacing = ".02em"
-            },
+    //                font - size: 0.9rem!important;
+    //font - weight: 300!important;
+    //line - height: 1.4!important;
+    //letter - spacing: 0.01em!important;
+},
             H4 = new H4Typography
             {
                 FontFamily = new[] { "Inter", "Helvetica", "Arial", "sans-serif" },
-                FontSize = "1.3rem",
-                FontWeight = "500",
+                FontSize = "0.8rem",
+                FontWeight = "300",
                 LineHeight = "1.7",
                 LetterSpacing = ".02em"
             },

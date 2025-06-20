@@ -383,6 +383,26 @@ namespace DBAccessLibrary
                 throw new Exception($"API AddUserVerses failed ({(int)response.StatusCode}): {payload}");
             }
         }
+
+        public async Task TogglePinCollection(Collection collection)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/togglepincolllection", collection);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API TogglePinCollection failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
+
+        public async Task UpdateCollectionsOrder(OrderInfo order)
+        {
+            var response = await http.PostAsJsonAsync($"api/verse/updatecollectionsorder", order);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API UpdateCollectionsOrder failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
         #endregion
     }
 }

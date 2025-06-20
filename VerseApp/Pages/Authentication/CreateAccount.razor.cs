@@ -13,6 +13,8 @@ namespace VerseApp.Pages.Authentication
         Data data { get; set; }
         [Inject]
         DataService dataservice { get; set; }
+        [Inject]
+        LoginInfo loginInfo { get; set; }
         private string errorMessage;
         private string message;
         private string firstName;
@@ -65,6 +67,20 @@ namespace VerseApp.Pages.Authentication
         {
             overlayVisible = !overlayVisible;
             StateHasChanged();
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            if (!string.IsNullOrEmpty(loginInfo.FirstName))
+                firstName = loginInfo.FirstName;
+
+            if (!string.IsNullOrEmpty(loginInfo.LastName))
+                lastName = loginInfo.LastName;
+
+            if (!string.IsNullOrEmpty(loginInfo.Username))
+                username = loginInfo.Username;
+
+            if (!string.IsNullOrEmpty(loginInfo.Email))
+                email = loginInfo.Email;
         }
 
         private void CloseDrawer()
@@ -140,6 +156,14 @@ namespace VerseApp.Pages.Authentication
                 progress = 100;
                 overlayMessage = "Done!";
                 await Task.Delay(1);
+                if (!string.IsNullOrEmpty(firstName))
+                    loginInfo.FirstName = firstName.Trim();
+                if (!string.IsNullOrEmpty(lastName))
+                    loginInfo.LastName = lastName.Trim();
+                if (!string.IsNullOrEmpty(username))
+                    loginInfo.Username = username.Trim();
+                if (!string.IsNullOrEmpty(email))
+                    loginInfo.Email = email.Trim();
                 nav.NavigateTo($"/authentication/createpassword/{firstName}/{lastName}/{username}/{email}");
             }
             catch (Exception ex)
@@ -162,6 +186,14 @@ namespace VerseApp.Pages.Authentication
 
         private void DataPrivacy_Click()
         {
+            if (!string.IsNullOrEmpty(firstName))
+                loginInfo.FirstName = firstName.Trim();
+            if (!string.IsNullOrEmpty(lastName))
+                loginInfo.LastName = lastName.Trim();
+            if (!string.IsNullOrEmpty(username))
+                loginInfo.Username = username.Trim();
+            if (!string.IsNullOrEmpty(email))
+                loginInfo.Email = email.Trim();
             nav.NavigateTo("/authentication/dataprivacy");
         }
 

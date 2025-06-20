@@ -299,9 +299,10 @@
         StateHasChanged();
     }
 
+    private int waited = 0;
     private async Task PollNotificationsAsync()
     {
-        while (true)
+        while (waited < 50)
         {
             if (!string.IsNullOrEmpty(data.currentUser.Username))
             {
@@ -311,6 +312,7 @@
             }
 
             await Task.Delay(TimeSpan.FromSeconds(30));
+            waited++;
         }
     }
 

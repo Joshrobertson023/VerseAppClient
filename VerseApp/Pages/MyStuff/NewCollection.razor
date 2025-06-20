@@ -131,46 +131,49 @@
             </MudButton>
         </div>
         <div id="verse-drawer-select" style="display: flex; justify-content: flex-start;">
-            <div style="width: 85%; display: flex; justify-content: flex-start;">
-            <MudSelect @bind-Value="book"
-                       Label="Book"
-                       Variant="Variant.Text"
-                       Style="width: 45% !important; margin-right: 10px;">
-                @foreach (var book in data.booksOfBible)
-                {
-                    <MudSelectItem Value="@book.ToString()">@book</MudSelectItem>
-                }
-            </MudSelect>
+            <div style="width: 100%; display: flex; flex-direction: column; align-items: flex-start;">
+                <div style="width: 100%; margin-bottom: 10px;">
+                    <MudSelect @bind-Value="book"
+                               Label="Book"
+                               Variant="Variant.Text"
+                               Style="width: 100% !important; min-width: 100% !important;">
+                        @foreach (var book in data.booksOfBible)
+                        {
+                            <MudSelectItem Value="@book.ToString()">@book</MudSelectItem>
+                        }
+                    </MudSelect>
+                </div>
+                <div style="display: flex; justify-content: flex-start">
 
-            <MudSelect T="int" @bind-Value="chapter"
-                       Variant="Variant.Text"
-                       Label="Chapter"
-                       Style="width: 20% !important; margin-right: 10px;">
-                @for (int i = 1; i <= numChapters; i++)
-                {
-                    var localI = i;
-                    <MudSelectItem T="int" Value="@localI">@localI</MudSelectItem>
-                }
-            </MudSelect>
+                    <MudSelect T="int" @bind-Value="chapter"
+                               Variant="Variant.Text"
+                               Label="Chapter"
+                               Style="width: 30% !important; min-width: 100px !important; margin-right: 10px;">
+                        @for (int i = 1; i <= numChapters; i++)
+                        {
+                            var localI = i;
+                            <MudSelectItem T="int" Value="@localI">@localI</MudSelectItem>
+                        }
+                    </MudSelect>
 
-            <MudSelect T="int"
-                       @bind-SelectedValues="selectedVerses"
-                       Variant="Variant.Text"
-                       Label="Verses"
-                       IconSize="Size.Small"
-                       MultiSelection="true"
-                       Style="width: 35% !important; margin-right: 10px;">
-                @for (int i = 1; i <= numVerses; i++)
-                {
-                    var _i = i;
-                    <MudSelectItem T="int" Value="@_i">@_i</MudSelectItem>
-                }
-            </MudSelect>
+                    <MudSelect T="int"
+                               @bind-SelectedValues="selectedVerses"
+                               Variant="Variant.Text"
+                               Label="Verses"
+                               IconSize="Size.Small"
+                               MultiSelection="true"
+                               Style="width: 40% !important; min-width: 40% !important; margin-right: 10px;">
+                        @for (int i = 1; i <= numVerses; i++)
+                        {
+                            var _i = i;
+                            <MudSelectItem T="int" Value="@_i">@_i</MudSelectItem>
+                        }
+                    </MudSelect>
+                    <div class="button" style="width: 20%;">
+                        <MudButton OnClick="Apply_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Apply</MudButton>
+                    </div>
+                </div>
             </div>
-            <div class="button" style="width: 15%;">
-                <MudButton OnClick="Apply_Click" Variant="Variant.Outlined" FullWidth="true" Color="Color.Secondary" Class="ml-auto">Apply</MudButton>
-            </div>
-
         </div>
         <div id="drawer-search">
             <div class="button custom" style="margin-top: 10px;">
@@ -180,8 +183,12 @@
                 </MudButton>
             </div>
         </div>
-        <div id="drawer-passage" style="height: 500px; overflow-y: auto;">
-            @if (!string.IsNullOrEmpty(drawerMessage))
+        <div id="drawer-passage" style="height: 400px; overflow-y: auto;">
+            @if (searching)
+            {
+                <h2 style="margin-bottom: 20px;">Searching...</h2> 
+            }
+            else if (!string.IsNullOrEmpty(drawerMessage))
             {
                 <h2 style="margin-bottom: 20px;">@drawerMessage</h2>
             }

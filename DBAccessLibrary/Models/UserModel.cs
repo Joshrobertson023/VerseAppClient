@@ -11,7 +11,8 @@ namespace DBAccessLibrary.Models
         public List<Collection> Collections { get; set; } = new List<Collection>();
         public List<Notification> Notifications { get; set; } = new List<Notification>();
         public List<Notification> NotificationsUnseen { get; set; } = new List<Notification>();
-        public string CollectionsSort { get; set; }
+        public int CollectionsSort { get; set; }
+        public string CollectionsOrder { get; set; }
         public int Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
@@ -43,7 +44,8 @@ namespace DBAccessLibrary.Models
             PasswordHash = hashedPassword;
             AuthToken = token;
             Status = status;
-            CollectionsSort = "none";
+            CollectionsOrder = "none";
+            CollectionsSort = 0;
         }
 
         public UserModel() { }
