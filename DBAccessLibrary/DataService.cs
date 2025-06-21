@@ -231,6 +231,16 @@ namespace DBAccessLibrary
             var response = await http.PostAsJsonAsync("api/user/sendresetlink", dto);
             response.EnsureSuccessStatusCode();
         }
+
+        public async Task SetUserActiveAsync(int userId)
+        {
+            var response = await http.PostAsJsonAsync($"api/user/setuseractive", userId);
+            if (!response.IsSuccessStatusCode)
+            {
+                var payload = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API SetUserActive failed ({(int)response.StatusCode}): {payload}");
+            }
+        }
         #endregion
 
         #region Verse Management

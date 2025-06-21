@@ -276,10 +276,11 @@ html, body, #app {
 .mud-drawer {
     background-color: #252525 !important;
     z-index: 9999999 !important;
+    margin-top: -17px !important;
 }
 
 .mud-drawer-content {
-    padding: 25px !important;
+    padding: 15px !important;
 }
 
 .notifications-popover {
@@ -335,6 +336,11 @@ html, body, #app {
     letter-spacing: 0.01em !important;
 }
 
+.green-dot {
+    top: 53px;
+    left: 53px;
+}
+
 .tiny-text {
     font-family: 'Inter', 'Helvetica', Arial, sans-serif;
     font-size: 0.6rem;
@@ -379,6 +385,26 @@ html, body, #app {
     align-items: center;
     justify-content: space-between;
     height: 70px !important;
+}
+
+.tab {
+    height: 90%;
+}
+
+.not-highlighted {
+    margin-bottom: 3px;
+}
+
+.highlighted {
+    border-bottom: 3px solid #1C6EA4;
+}
+
+.no-underline-hover:hover {
+    text-decoration: none;
+}
+
+.mud-drawer.mud-drawer-responsive.mud-drawer-pos-right, .mud-drawer.mud-drawer-persistent.mud-drawer-pos-right {
+    margin-top: -17px;
 }
 
 .bottom-appbar .mud-toolbar-appbar {

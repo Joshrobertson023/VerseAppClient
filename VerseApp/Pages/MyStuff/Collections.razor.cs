@@ -28,6 +28,7 @@ namespace VerseApp.Pages.MyStuff
         private bool reorganizing = false;
         private bool overlayVisible = false;
         private int sortBy = 0; // 0 = Title, 1 = Date Created, 2 = Date Practiced, 3 = Most Completed, 4 = Custom
+        List<Collection> collections = new List<Collection>();
         public int SortBy { get => sortBy;
             set
             {
@@ -65,15 +66,23 @@ namespace VerseApp.Pages.MyStuff
         private async Task PinCollection(Collection collection)
         {
             collection.Pinned = collection.Pinned == 1 ? 0 : 1;
-
-            //data.currentUser.CollectionsOrder = Algorithms.GetSortOrder(data.currentUser.Collections, 
-            //                                                            data.currentUser.CollectionsSort);
-            //Console.WriteLine($"CollectionsOrder: {data.currentUser.CollectionsOrder}");
-            //data.currentUser.Collections = Algorithms.Sort(data.currentUser.Collections,
-            //                                               data.currentUser.CollectionsOrder);
-            
+            Sort();
             await dataservice.TogglePinCollection(collection);
         }
+
+        string pinnedOrder = string.Empty;
+        private void BuildPinned()
+        {
+            pinnedOrder = string.Empty;
+            foreach (var collection in data.currentUser.Collections.Where(c => c.Pinned == 1))
+            {
+                pinnedOrder += $"{collection.Id},";
+            }
+            Console.WriteLine("PinnedOrder: " + pinnedOrder);
+            if (string.IsNullOrEmpty(pinnedOrder))
+                pinnedOrder = "NONE";
+        }
+
         private int placeholderIndex = -1;
 
         void ClearPlaceholder()
@@ -83,59 +92,59 @@ namespace VerseApp.Pages.MyStuff
 
         void OnDragOver(int index, int pinnedCount)
         {
-            if (draggingModel?.Collection.Pinned == 1)
-                placeholderIndex = Math.Min(index, pinnedCount - 1);
-            else
-                placeholderIndex = Math.Max(index, pinnedCount);
+            //if (draggingModel?.Collection.Pinned == 1)
+            //    placeholderIndex = Math.Min(index, pinnedCount - 1);
+            //else
+            //    placeholderIndex = Math.Max(index, pinnedCount);
         }
 
         void HandleDrop(ReorderModel landingModel, int pinnedCount)
         {
-            if (draggingModel is null) return;
+            //if (draggingModel is null) return;
 
-            int targetOrder = landingModel.Order;
-            if (draggingModel.Collection.Pinned == 1)
-                targetOrder = Math.Min(targetOrder, pinnedCount - 1);
-            else
-                targetOrder = Math.Max(targetOrder, pinnedCount);
+            //int targetOrder = landingModel.Order;
+            //if (draggingModel.Collection.Pinned == 1)
+            //    targetOrder = Math.Min(targetOrder, pinnedCount - 1);
+            //else
+            //    targetOrder = Math.Max(targetOrder, pinnedCount);
 
-            foreach (var m in reorderList.Where(x => x.Order >= targetOrder))
-                m.Order++;
-            draggingModel.Order = targetOrder;
+            //foreach (var m in reorderList.Where(x => x.Order >= targetOrder))
+            //    m.Order++;
+            //draggingModel.Order = targetOrder;
 
-            int idx = 0;
-            foreach (var m in reorderList.OrderBy(x => x.Order))
-            {
-                m.Order = idx++;
-                m.IsDragOver = false;
-            }
+            //int idx = 0;
+            //foreach (var m in reorderList.OrderBy(x => x.Order))
+            //{
+            //    m.Order = idx++;
+            //    m.IsDragOver = false;
+            //}
         }
 
         private async Task Done_Click()
         {
             string newOrder = string.Empty;
-            if (SortBy == 4)
-            {
-                newOrder = string.Join(",", reorderList.OrderBy(x => x.Order).Select(x => x.Collection.Id)) + ",";
-                data.currentUser.CollectionsOrder = newOrder;
-                data.currentUser.Collections = reorderList.OrderBy(x => x.Order).Select(x => x.Collection).ToList();
-                await dataservice.UpdateCollectionsOrder(new OrderInfo
-                {
-                    UserId = data.currentUser.Id,
-                    OrderBy = data.currentUser.CollectionsSort,
-                    Order = newOrder
-                });
-            }
-            else
-            {
-                data.currentUser.Collections = reorderList.OrderBy(x => x.Order).Select(x => x.Collection).ToList();
-                await dataservice.UpdateCollectionsOrder(new OrderInfo
-                {
-                    UserId = data.currentUser.Id,
-                    OrderBy = data.currentUser.CollectionsSort,
-                    Order = data.currentUser.CollectionsOrder
-                });
-            }
+            //if (SortBy == 4)
+            //{
+            //    newOrder = string.Join(",", reorderList.OrderBy(x => x.Order).Select(x => x.Collection.Id)) + ",";
+            //    data.currentUser.CollectionsOrder = newOrder;
+            //    data.currentUser.Collections = reorderList.OrderBy(x => x.Order).Select(x => x.Collection).ToList();
+            //    await dataservice.UpdateCollectionsOrder(new OrderInfo
+            //    {
+            //        UserId = data.currentUser.Id,
+            //        OrderBy = data.currentUser.CollectionsSort,
+            //        Order = newOrder
+            //    });
+            //}
+            //else
+            //{
+            //    data.currentUser.Collections = reorderList.OrderBy(x => x.Order).Select(x => x.Collection).ToList();
+            //    await dataservice.UpdateCollectionsOrder(new OrderInfo
+            //    {
+            //        UserId = data.currentUser.Id,
+            //        OrderBy = data.currentUser.CollectionsSort,
+            //        Order = data.currentUser.CollectionsOrder
+            //    });
+            //}
             
             reorganizing = false;
         }
@@ -145,33 +154,38 @@ namespace VerseApp.Pages.MyStuff
             if (!checkEnabled) return;
             checkEnabled = false;
             Sort();
-            await dataservice.UpdateCollectionsOrder(new OrderInfo { UserId = data.currentUser.Id,
-                                                                     OrderBy = data.currentUser.CollectionsSort, 
-                                                                     Order = data.currentUser.CollectionsOrder });
+            Console.WriteLine("SortByChanged called with SortBy: " + SortBy);
+            await dataservice.UpdateCollectionsOrder(new OrderInfo
+            {
+                UserId = data.currentUser.Id,
+                OrderBy = data.currentUser.CollectionsSort,
+                Order = data.currentUser.CollectionsOrder
+            });
             checkEnabled = true;
         }
 
         private bool checkEnabled = true;
         private void Sort()
         {
+            BuildPinned();
             if (SortBy == 4)
-                (data.currentUser.CollectionsOrder, 
-                 data.currentUser.Collections)      = Algorithms.SortCustom(data.currentUser.Collections,
-                                                                              data.currentUser.CollectionsSort);
-            Console.WriteLine($"CollectionsOrder: {data.currentUser.CollectionsOrder}");
-            Console.WriteLine("Order by: " + data.currentUser.CollectionsSort);
-            data.currentUser.Collections = Algorithms.Sort(data.currentUser.Collections,
-                                                           data.currentUser.CollectionsSort);
+                (data.currentUser.Collections, data.currentUser.CollectionsOrder, pinnedOrder)
+                    = Algorithms.SortCustom(data.currentUser.Collections, data.currentUser.CollectionsOrder, pinnedOrder);
+            else
+                data.currentUser.Collections = Algorithms.Sort(data.currentUser.Collections, SortBy, pinnedOrder);
+
+            data.currentUser.CollectionsSort = SortBy;
+            Console.WriteLine($"\nCollectionsOrder (unchanged if not 4): {data.currentUser.CollectionsOrder}");
         }
 
         private void Reorder_Click()
         {
-            reorganizing = true;
-            reorderList = data.currentUser.Collections.Select((c, i) => new ReorderModel
-            {
-                Order = i,
-                Collection = c
-            }).ToList();
+        //    reorganizing = true;
+        //    reorderList = data.currentUser.Collections.Select((c, i) => new ReorderModel
+        //    {
+        //        Order = i,
+        //        Collection = c
+        //    }).ToList();
         }
 
         private class ReorderModel
@@ -194,6 +208,7 @@ namespace VerseApp.Pages.MyStuff
         }
 
         private bool isLoading = true;
+        private string customOrderBackup;
         protected override async Task OnInitializedAsync()
         {
             pageStructure.MyStuff = "/";
@@ -205,10 +220,29 @@ namespace VerseApp.Pages.MyStuff
                     Console.WriteLine("Waiting to get collections");
                 }
 
-                if (data.currentUser.Collections == null || data.currentUser.Collections.Count == 0)
+                while (data.currentUser.Id == null || data.currentUser.Id <= 0)
+                {
+                    await Task.Delay(2000);
+                    Console.WriteLine("Waiting to grab collections, userId is null.");
+                }
+
+                data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
+                Console.WriteLine("Grabbed user collections.");
+
+                while (data.currentUser.Collections == null || data.currentUser.Collections.Count <= 0)
+                {
+                    await Task.Delay(2000);
+                    Console.WriteLine("Waiting to re-grab collections since they were null.");
                     data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
+                }
+
                 SortBy = data.currentUser.CollectionsSort;
-                Sort();
+                //customOrderBackup = string.Join(",", reorderList.OrderBy(x => x.Order).Select(x => x.Collection.Id)) + ",";
+                //Sort();
+
+                Console.WriteLine("CustomOrderBackup: " + customOrderBackup);
+                Console.WriteLine("CollectionsSort: " + data.currentUser.CollectionsSort);
+
                 foreach (var collection in data.currentUser.Collections)
                 {
                     Console.WriteLine($"Collection: {collection.Title}, Pinned: {collection.Pinned}, Progress: {collection.ProgressPercent}");
@@ -266,8 +300,11 @@ namespace VerseApp.Pages.MyStuff
                     yesText: "Delete", cancelText: "Cancel");
                 if (result != null)
                 {
-                    data.currentUser.Collections.Remove(collection);
+                    data.currentUser.Collections.RemoveAll(c => c.Id == collection.Id);
                     await dataservice.DeleteCollectionAsync(collection.Id);
+                    data.currentUser.CollectionsOrder = data.currentUser.CollectionsOrder.Replace($"{collection.Id},", string.Empty);
+                    data.currentUser.Collections = await dataservice.GetUserCollections(data.currentUser.Id);
+                    StateHasChanged();
                 }
             }
             catch (Exception ex)

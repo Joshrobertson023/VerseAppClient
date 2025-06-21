@@ -21,13 +21,25 @@
                     {
                         if (pageSelected == 0)
                         {
-                            <MudButton OnClick="Collections_Click" Variant="Variant.Text" Style="text-decoration: underline; width: 25% !important;">Collections</MudButton>
-                            <MudButton OnClick="Plans_Click" Variant="Variant.Text" Style="width: 25% !important;">Plans</MudButton>
+                            <div style="display: flex; justify-content: flex-start; align-items: center;">
+                                <div class="tab highlighted">
+                                    <MudButton OnClick="Collections_Click" Variant="Variant.Text"><p class="no-underline-hover">Collections</p></MudButton>
+                                </div>
+                                <div class="tab not-highlighted">
+                                    <MudButton OnClick="Plans_Click" Variant="Variant.Text"><p class="no-underline-hover">Plans</p></MudButton>
+                                </div>
+                            </div>
                         }
                         else
                         {
-                            <MudButton OnClick="Collections_Click" Variant="Variant.Text" Style="width: 25% !important;">Collections</MudButton>
-                            <MudButton OnClick="Plans_Click" Variant="Variant.Text" Style="text-decoration: underline; width: 25% !important;">Plans</MudButton>
+                            <div style="display: flex; justify-content: flex-start; align-items: center;">
+                                <div class="tab not-highlighted">
+                                    <MudButton OnClick="Collections_Click" Variant="Variant.Text"><p class="no-underline-hover">Collections</p></MudButton>
+                                </div>
+                                <div class="tab highlighted">
+                                    <MudButton OnClick="Plans_Click" Variant="Variant.Text"><p class="no-underline-hover">Plans</p></MudButton>
+                                </div>
+                            </div>
                         }
                     }
                     else if (secondOpen)
@@ -50,7 +62,7 @@
 
                     <div style="display: flex; align-items: center;">
                         @* -- Notifications -- *@
-                        <MudButton OnClick="ToggleNotificationsOpen">
+                        <MudButton Style="width: 25px;" OnClick="ToggleNotificationsOpen">
                             @if (data.currentUser.NotificationsUnseen.Count == 0)
                             {
                                 <MudIcon Icon="@Icons.Material.Filled.Notifications" Size="Size.Medium"></MudIcon>
@@ -193,7 +205,54 @@
             </div>
 
 
-            <MudDrawer @bind-Open="@profileDrawerOpen" Style="padding: 15px;" Anchor="Anchor.End">
+            <MudDrawer @bind-Open="@profileDrawerOpen" Style="margin-top: -17px !important;" Anchor="Anchor.End">
+
+                <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; align-items: center;">
+                        @if (!string.IsNullOrEmpty(data.currentUser?.Username))
+                        {
+                            <div>
+                                <MudAvatar Color="Color.Secondary" Variant="Variant.Outlined" Style="width: 50px; height: 50px; font-size: 20px;">
+                                    @data.currentUser.Username.ToUpper()[0]
+                                </MudAvatar>
+                                <div style="width: 10px; height: 10px; position: absolute; border-radius: 20px; background-color: #22DF41;" class="green-dot"></div>
+                            </div>
+                        }
+                        else
+                        {
+                            <MudIcon Icon="@Icons.Material.Filled.Person" />
+                        }
+                    </div>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start; height: 100%; justify-content: center; margin-left: 10px;">
+                        @if (!string.IsNullOrEmpty(data.currentUser?.Username))
+                        {
+                            <h2>@data.currentUser.FullName</h2>
+                            <h3 class="h3">@("@" + data.currentUser.Username)</h3>
+                        }
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <div>
+                            <MudIcon Style="margin-left: -5px;" Icon="@Icons.Material.Filled.LocalFireDepartment"></MudIcon>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start">
+                            <h3 style="margin-bottom: -6px;">@(data.currentUser.Streak)</h3>
+                            <p>Day Streak</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; justify-content: flex-start;">
+                        <div>
+                            <MudIcon Style="margin-left: -5px;" Icon="@Icons.Material.Filled.DoneAll"></MudIcon>
+                        </div>
+                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: flex-start">
+                            <h3 style="margin-bottom: -6px;">@(data.currentUser.VersesInMemory)</h3>
+                            <p>Verses in Memory</p>
+                        </div>
+                    </div>
+                </div>
+
                 @if(data.Admins.Contains(data.currentUser.Username))
                 {
                     <div class="button">
@@ -274,6 +333,7 @@
             data.currentUser = await dataservice.LoginUserWithTokenAsync(token);
             data.currentUser.Notifications = await dataservice.GetUserNotifications(data.currentUser.Username);
             _ = PollNotificationsAsync();
+            _ = SetUserActiveAsync();
             if (data.currentUser == null)
             {
                 Console.WriteLine("currentUser is null.");
@@ -311,12 +371,20 @@
                 await InvokeAsync(StateHasChanged);
             }
 
-            await Task.Delay(TimeSpan.FromSeconds(30));
+            await Task.Delay(TimeSpan.FromSeconds(40));
             waited++;
         }
     }
 
-
+    private async Task SetUserActiveAsync()
+    {
+        if (data.currentUser != null && !string.IsNullOrEmpty(data.currentUser.Username))
+        {
+            await dataservice.SetUserActiveAsync(data.currentUser.Id);
+            Console.WriteLine("Set user active.");
+            await Task.Delay(TimeSpan.FromMinutes(2));
+        }
+    }
 
     bool profileDrawerOpen = false;
     private Anchor anchor;

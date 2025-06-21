@@ -53,7 +53,6 @@
 
 <ul style="list-style:none; padding:0; margin:0;">
   @{
-    // sort and count pinned
     var sorted      = reorderList.OrderBy(x => x.Order).ToList();
     var pinnedCount = sorted.Count(x => x.Collection.Pinned == 1);
     var count       = sorted.Count;
@@ -61,13 +60,11 @@
 
   @for (int i = 0; i <= count; i++)
   {
-    // 1) placeholder line
     if (i == placeholderIndex)
     {
       <li @key="@($"placeholder-{i}")" class="drop-line"></li>
     }
 
-    // 2) real item if i < count
     if (i < count)
     {
       var item     = sorted[i];
@@ -79,27 +76,22 @@
         @ondragover="() => OnDragOver(i, pinnedCount)"
         @ondragleave="() => ClearPlaceholder()"
         @ondrop="() => HandleDrop(item, pinnedCount)"
-        style="padding:4px 0;"
-      >
+        style="padding:4px 0;">
         <div
           draggable="true"
           style="display:flex; align-items:center; cursor:move;"
           @ondragstart="() => draggingModel = item"
-          @ondragend="() => { draggingModel = null; ClearPlaceholder(); }"
-        >
+          @ondragend="() => { draggingModel = null; ClearPlaceholder(); }">
           <MudIcon
             Icon="@Icons.Material.Filled.DragIndicator" 
             Size="Size.Small"
-            Style="margin-right:8px;"
-          />
-          @* show pin icon for pinned *@  
+            Style="margin-right:8px;"/>       
           @if (isPinned)
           {
             <MudIcon
               Icon="@Icons.Material.Filled.PushPin"
               Size="Size.Small"
-              Style="margin-right:8px;"
-            />
+              Style="margin-right:8px;"/>
           }
           <span>@item.Collection.Title</span>
         </div>
@@ -125,16 +117,16 @@
                     {
                         <MudButton OnClick="Reorder_Click" Variant="Variant.Outlined" Size="Size.Small" Style="height: 25px !important;" Color="Color.Secondary">Reorder</MudButton>
                     }
-                </div>
+                </div>    
                 <MudButton OnClick="AddCollection"><MudIcon Icon="@Icons.Material.Filled.Add" Title="Add Collection" Size="Size.Small" Color="Color.Secondary" /></MudButton>
-            </div>
+            </div> 
 
             @foreach (var collection in data.currentUser.Collections)
-            {
-                <div class="collection">
+            { 
+                <div class="collection"> 
                     <a onclick="@(() => OpenCollection(collection))" style="display: flex; cursor: pointer; flex-direction: column; height: 100%; width: 80%; justify-content: space-between;">
                         <div style="display: flex; flex-direction: column;">
-                            <h2>@collection.Title</h2>
+                            <h2>@collection.Title</h2> 
                             @if (collection.NumVerses == 1) 
                             {
                                 <p>@(collection.NumVerses + " Passage")</p>

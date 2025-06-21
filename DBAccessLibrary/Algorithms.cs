@@ -30,68 +30,129 @@ namespace DBAccessLibrary
             }
         }
 
-        public static List<Collection> Sort(List<Collection> _collections, int sortBy)
+        public static List<Collection> Sort(List<Collection> _collections, int sortBy, string pinned)
         {
-            List<Collection> collections = new List<Collection>();
+            Console.WriteLine("Sort ran.");
+            var collections = new List<Collection>();
+            var pinnedCollections = new List<Collection>();
 
-            if (sortBy == 0)
+            foreach (var pin in pinned.Split(','))
             {
-                collections.Sort((x, y) => DateTime.Compare(y.DateCreated, x.DateCreated));
+                pinnedCollections.Add(collections.FirstOrDefault(c => c.Id.ToString() == pin));
             }
-            else if (sortBy == 1)
+            foreach (var collection in collections)
             {
-                collections.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.OrdinalIgnoreCase));
-            }
-            else if (sortBy == 2)
-            {
-                collections.Sort((x, y) => DateTime.Compare(x.LastPracticed, y.LastPracticed));
-            }
-            else if (sortBy == 3)
-            {
-                collections.Sort((x, y) => y.ProgressPercent.CompareTo(x.ProgressPercent));
-            }
-            else if (sortBy == 4)
-            {
-                return _collections;
+                if (!pinnedCollections.Contains(collection) && collection.Pinned == 0)
+                    collections.Add(collection);
             }
 
+            switch (sortBy)
+            {
+                case 0:
+                    collections.Sort((x, y) => DateTime.Compare(y.DateCreated, x.DateCreated));
+                    break;
+                case 1:
+                    collections.Sort((x, y) => string.Compare(x.Title, y.Title, StringComparison.OrdinalIgnoreCase));
+                    break;
+                case 2:
+                    collections.Sort((x, y) => DateTime.Compare(x.LastPracticed, y.LastPracticed));
+                    break;
+                case 3:
+                    collections.Sort((x, y) => y.ProgressPercent.CompareTo(x.ProgressPercent));
+                    break;
+                default:
+                    break;
+            }
+
+            pinnedCollections.AddRange(collections);
+            collections = pinnedCollections;
+            foreach (var col in collections)
+            {
+                Console.WriteLine(col.Title);
+            }
             return collections;
         }
 
-        public static (string, List<Collection>) SortCustom(List<Collection> collections, int sortBy)
+
+        public static (List<Collection>, string, string) SortCustom(List<Collection> collections, string order, string pinned)
         {
+            Console.WriteLine("Custom sort ran.");
             List<Collection> sortedCollections = new List<Collection>();
+            List<Collection> pinnedCollections = new List<Collection>();
             string newSort = string.Empty;
-            
-            if (sortBy == 4)
+            string newPinned = string.Empty;
+
+            if (order.Contains(",0,"))
             {
+                order = string.Empty;
+                Console.WriteLine("Order contains ,0, so resetting order to empty string.");
+            }
+
+            if (string.IsNullOrEmpty(order) || order == "NONE")
+            {
+                order = string.Empty;
+                Console.WriteLine("Order is empty or NONE, so resetting order to empty string.");
                 foreach (var collection in collections)
                 {
                     if (collection.Pinned == 1)
-                        sortedCollections.Add(collection);
+                    {
+                        pinnedCollections.Add(collection);
+                        newPinned += $"{collection.Id},";
+                    }
                 }
 
                 foreach (var collection in collections)
                 {
                     if (!sortedCollections.Contains(collection) && collection.Pinned == 0)
+                    {
                         sortedCollections.Add(collection);
+                        newSort += $"{collection.Id},";
+                    }
                 }
+                pinnedCollections.AddRange(sortedCollections);
+                collections = pinnedCollections;
+            }
+            else
+            {
+                int count = 0;
 
-                foreach (var collection in sortedCollections)
+                foreach (var pin in pinned.Split(',').Where(p => !string.IsNullOrEmpty(p)))
                 {
-                    newSort += $"{collection.Id},";
+                    Collection col = collections.FirstOrDefault(c => c.Id.ToString() == pin);
+                    pinnedCollections.Add(col);
+                    count++;
                 }
 
-                collections = sortedCollections;
+                foreach (var ord in order.Split(',').Where(o => !string.IsNullOrEmpty(o)))
+                {
+                    Collection col = collections.FirstOrDefault(c => c.Id.ToString() == ord);
+                    sortedCollections.Add(col);
+                    count++;
+                }
+                if (count < collections.Count)
+                {
+                    foreach (var collection in collections)
+                    {
+                        if (!sortedCollections.Contains(collection) && !pinnedCollections.Contains(collection))
+                        {
+                            if (collection.Pinned == 1)
+                            {
+                                pinnedCollections.Add(collection);
+                                newPinned += $"{collection.Id},";
+                            }
+                            else
+                            {
+                                sortedCollections.Add(collection);
+                                newSort += $"{collection.Id},";
+                            }
+                        }
+                    }
+                }
+                pinnedCollections.AddRange(sortedCollections);
+                collections = pinnedCollections;
             }
 
-            //foreach (var order in newSort.Split(',').Where(o => !string.IsNullOrEmpty(o)))
-            //{
-            //    Collection col = collections.FirstOrDefault(c => c.Id.ToString() == order);
-            //    collections.Add(col);
-            //}
-
-            return (newSort, collections);
+            return (collections, newSort, newPinned);
         }
     }
 }

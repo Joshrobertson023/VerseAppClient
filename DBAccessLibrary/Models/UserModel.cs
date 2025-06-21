@@ -13,6 +13,8 @@ namespace DBAccessLibrary.Models
         public List<Notification> NotificationsUnseen { get; set; } = new List<Notification>();
         public int CollectionsSort { get; set; }
         public string CollectionsOrder { get; set; }
+        public int Streak { get; set; }
+        public int VersesInMemory { get; set; }
         public int Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
